@@ -1,0 +1,15 @@
+[
+  {
+    "id": "TXN-20260414-001",
+    "patientId": "HMS26-1003",
+    "patientName": "Sarah Opio",
+    "services": [
+      "Consultation - 30,000"
+    ],
+    "amount": 30000,
+    "method": "Cash",
+    "cashier": "Grace Nalwoga",
+    "timestamp": "10:10",
+    "date": "2026-04-15"
+  }
+]

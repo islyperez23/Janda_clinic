@@ -1,0 +1,42 @@
+[
+  {
+    "id": "LAB001",
+    "patientId": "HMS26-1001",
+    "patientName": "Alice Namukasa",
+    "test": "Malaria RDT",
+    "requestedBy": "Dr. Okello",
+    "status": "completed",
+    "timestamp": "09:30",
+    "result": "bloat"
+  },
+  {
+    "status": "completed",
+    "result": "bloat",
+    "timestamp": "04:56 PM",
+    "id": "LAB1776347792074",
+    "patientId": "HMS26-9404",
+    "patientName": "izzy teno",
+    "test": "teno",
+    "requestedBy": "Dr. James Okello"
+  },
+  {
+    "status": "completed",
+    "result": "Malaria",
+    "timestamp": "06:25 PM",
+    "id": "LAB1776353129815",
+    "patientId": "HMS26-4205",
+    "patientName": "kobe khan",
+    "test": "kobe Kan",
+    "requestedBy": "Dr. James Okello"
+  },
+  {
+    "status": "completed",
+    "result": "positive",
+    "timestamp": "06:43 PM",
+    "id": "LAB1776354230030",
+    "patientId": "HMS26-3062",
+    "patientName": "bryant kalungi",
+    "test": "headache",
+    "requestedBy": "Dr. James Okello"
+  }
+]

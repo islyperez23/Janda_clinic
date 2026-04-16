@@ -1,0 +1,12 @@
+[
+  {
+    "id": "APT001",
+    "patientId": "HMS26-1002",
+    "patientName": "John Kato",
+    "date": "2026-04-28",
+    "time": "09:00",
+    "doctor": "Dr. Okello",
+    "reason": "BP Review",
+    "status": "scheduled"
+  }
+]

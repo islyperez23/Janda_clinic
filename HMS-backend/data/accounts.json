@@ -1,0 +1,82 @@
+[
+  {
+    "id": "USR001",
+    "username": "receptionist",
+    "password": "$2a$10$db14leO/XbhgUd/tg25Z4OWWNvjn9NOwePp9sNRhXmOq9YCKHPRIC",
+    "role": "receptionist",
+    "name": "Grace Nalwoga",
+    "active": true
+  },
+  {
+    "id": "USR002",
+    "username": "doctor",
+    "password": "$2a$10$Nh0rSv5pHCPWMmt6Xgy7p.qeSA4Ht8mbzP5BdIGTKhTTpe9yvZPdS",
+    "role": "doctor",
+    "name": "Dr. James Okello",
+    "active": true
+  },
+  {
+    "id": "USR003",
+    "username": "nurse",
+    "password": "$2a$10$HTD31QlOeaztJuihB3WsyuPh.bvUM0guo2NBZy8WMMDYR9pM/D/L2",
+    "role": "nurse",
+    "name": "Amina Nabukeera",
+    "active": true
+  },
+  {
+    "id": "USR004",
+    "username": "lab",
+    "password": "$2a$10$CEH5g/Ab7uIipGS.i4TBOOs6Ztvvzzf6Y63ZodUDu2UC4DhjIvmA2",
+    "role": "lab",
+    "name": "Peter Ssemwogerere",
+    "active": true
+  },
+  {
+    "id": "USR005",
+    "username": "pharmacy",
+    "password": "$2a$10$wuC/iCK.KhtDGuH..li/zOQVRR/jEl3WG8rGfOW0i0zplC1EGaF1W",
+    "role": "pharmacy",
+    "name": "Lydia Nassuna",
+    "active": true
+  },
+  {
+    "id": "USR006",
+    "username": "dentist",
+    "password": "$2a$10$regjgBNisC5C56OijwKeZe644G5MPyjmqEoJgc67CS65IWGCOVFM6",
+    "role": "dentist",
+    "name": "Dr. Faith Auma",
+    "active": true
+  },
+  {
+    "id": "USR007",
+    "username": "accountant",
+    "password": "$2a$10$MBOon7cA7mMN5utY/AlLCuv5h5B2AHnIx76njHaHFjkKL3rGcr2sq",
+    "role": "accountant",
+    "name": "Ruth Akello",
+    "active": true
+  },
+  {
+    "id": "USR008",
+    "username": "director",
+    "password": "$2a$10$dDlH3zIFfaFCOptUL.dtou32AnLemwINDtWz1n8znAJ1SriR6Kn1G",
+    "role": "director",
+    "name": "Prof. Simon Muwanga",
+    "active": true
+  },
+  {
+    "id": "USR009",
+    "username": "admin",
+    "password": "$2a$10$k4OYACw5Y03bSm/MtKp00uJBlCKVH1.hDNpsMw7rFuRMDJImMIDCO",
+    "role": "admin",
+    "name": "System Administrator",
+    "active": true
+  },
+  {
+    "id": "USR1776339493117",
+    "name": "Testing System",
+    "username": "Dummy",
+    "password": "$2a$10$BwoPzo.8ueR68w6BIl933.UPMDpLQABSrE3IfoMpr8vNXvPShgaBa",
+    "role": "receptionist",
+    "active": false
+  }
+]
