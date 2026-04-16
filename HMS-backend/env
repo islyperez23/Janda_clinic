@@ -1,0 +1,4 @@
+JWT_SECRET=hms-local-dev-secret-do-not-use-in-production
+PORT=3001
+NODE_ENV=development
+FRONTEND_ORIGIN=http://localhost:5173
