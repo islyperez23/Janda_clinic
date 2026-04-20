@@ -11,5 +11,32 @@
     "cashier": "Grace Nalwoga",
     "timestamp": "10:10",
     "date": "2026-04-15"
+  },
+  {
+    "date": "2026-04-16",
+    "timestamp": "10:34 PM",
+    "id": "TXN-20260416-138",
+    "patientId": "HMS26-4205",
+    "patientName": "kobe khan",
+    "services": [
+      "panadol",
+      "coartem"
+    ],
+    "amount": 20000,
+    "method": "Cash",
+    "cashier": "Lydia Nassuna"
+  },
+  {
+    "date": "2026-04-16",
+    "timestamp": "10:48 PM",
+    "id": "TXN-20260416-516",
+    "patientId": "HMS26-3062",
+    "patientName": "bryant kalungi",
+    "services": [
+      "coartem"
+    ],
+    "amount": 2000,
+    "method": "Cash",
+    "cashier": "Lydia Nassuna"
   }
 ]

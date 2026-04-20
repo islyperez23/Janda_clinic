@@ -11,22 +11,11 @@
   },
   {
     "priority": "normal",
-    "timestamp": "06:22 PM",
+    "timestamp": "10:18 PM",
     "assignedTo": "",
-    "patientId": "HMS26-4205",
-    "name": "kobe khan",
-    "stage": "lab",
-    "complaint": "headache",
-    "specialist": "Doctor",
-    "nurseResultsReady": true
-  },
-  {
-    "priority": "normal",
-    "timestamp": "06:43 PM",
-    "assignedTo": "",
-    "patientId": "HMS26-3062",
-    "name": "bryant kalungi",
-    "stage": "lab",
+    "patientId": "HMS26-7356",
+    "name": "this is clean",
+    "stage": "doctor",
     "complaint": "headache",
     "specialist": "Doctor"
   }

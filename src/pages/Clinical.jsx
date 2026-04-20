@@ -215,6 +215,8 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const myQueue = queue.filter(e => e.stage === "doctor");
+  // All patients the doctor is tracking (includes ones temporarily at lab/nurse)
+  const allMyPatients = queue.filter(e => ["doctor","nurse","lab"].includes(e.stage));
   const patient = patients.find(p => p.id === pid);
   const pendingVitals = patient?.pendingVitals;
 
@@ -223,10 +225,11 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
   // Pending lab orders for this patient
   const myLabPending = labOrders.filter(o => o.patientId === pid && o.status === "pending");
 
-  // Nurse results badge: patient has vitals AND is back in doctor queue
+  // Track whether patient is still in doctor's queue
+  const stillInQueue = !!queue.find(e => e.patientId === pid && e.stage === "doctor");
+
   const hasNurseResults = !!pendingVitals;
   const hasLabResults   = myLabResults.length > 0;
-  const newResultsCount = (hasNurseResults ? 1 : 0) + (hasLabResults ? 1 : 0);
 
   // When a different patient is selected, reset form and go to consultation tab
   const selectPatient = (newPid) => {
@@ -330,17 +333,22 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
 
       {/* ── Left: queue + patient card ── */}
       <div>
-        <Card title={`My Queue (${myQueue.length})`} style={{ marginBottom: 12 }}>
-          {myQueue.length === 0
-            ? <EmptyState icon="✅" message="No patients in your queue" />
-            : myQueue.map(e => (
+        <Card title={`My Patients (${allMyPatients.length})`} style={{ marginBottom: 12 }}>
+          {allMyPatients.length === 0
+            ? <EmptyState icon="✅" message="No patients assigned to you" />
+            : allMyPatients.map(e => (
               <div key={e.patientId} onClick={() => selectPatient(e.patientId)}
                 style={{ padding: "9px 10px", borderRadius: 8, border: `1.5px solid ${pid === e.patientId ? C.green : C.border}`, cursor: "pointer", marginBottom: 6, background: pid === e.patientId ? "rgba(16,185,129,0.08)" : "transparent", position: "relative" }}>
                 <div style={{ fontWeight: 700, fontSize: 13 }}>{e.name}</div>
                 <div style={{ fontSize: 10, color: C.textMid, fontFamily: "'IBM Plex Mono',monospace" }}>{e.patientId}</div>
                 <div style={{ fontSize: 11, color: C.textLight, marginTop: 2 }}>{e.complaint}</div>
-                {e.nurseResultsReady && (
-                  <div style={{ position: "absolute", top: 6, right: 8, background: C.purple, color: "#fff", borderRadius: 10, padding: "1px 6px", fontSize: 9, fontWeight: 700 }}>VITALS READY</div>
+                {e.stage !== "doctor" && (
+                  <div style={{ position: "absolute", top: 6, right: 8, background: e.stage==="lab"?C.amber:C.purple, color: "#fff", borderRadius: 10, padding: "1px 6px", fontSize: 9, fontWeight: 700, textTransform:"uppercase" }}>
+                    {e.stage==="lab"?"AT LAB":"AT NURSE"}
+                  </div>
+                )}
+                {e.nurseResultsReady && e.stage==="doctor" && (
+                  <div style={{ position: "absolute", top: 6, right: 8, background: C.green, color: "#fff", borderRadius: 10, padding: "1px 6px", fontSize: 9, fontWeight: 700 }}>RESULTS READY</div>
                 )}
               </div>
             ))}
@@ -358,7 +366,7 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
               <div style={{ fontSize: 11, marginTop: 4 }}>📞 {patient.emergencyContact || "—"}</div>
             </div>
             {/* Results ready indicators */}
-            {newResultsCount > 0 && (
+            {(hasNurseResults || hasLabResults) && (
               <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 5 }}>
                 {hasNurseResults && (
                   <div style={{ background: C.purpleLight, border: `1px solid ${C.purple}44`, borderRadius: 7, padding: "6px 10px", fontSize: 11, color: C.purple, fontWeight: 700, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -384,6 +392,21 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
           ? <EmptyState icon="👨‍⚕️" message="Select a patient from your queue on the left" />
           : (
             <>
+              {/* Banner: patient is currently at lab/nurse but doctor can still see form */}
+              {pid && !stillInQueue && (
+                <div style={{ background: C.amberLight, border: `1.5px solid ${C.amber}`, borderRadius: 9, padding: "10px 16px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <div style={{ fontWeight: 700, color: C.amber, fontSize: 13 }}>
+                      ⏳ {patient?.name} is currently at {queue.find(e=>e.patientId===pid)?.stage || "another stage"}
+                    </div>
+                    <div style={{ fontSize: 12, color: C.textMid, marginTop: 2 }}>
+                      Your form is preserved. Patient will return here once results are ready. Check the Nurse Results or Lab Results tabs.
+                    </div>
+                  </div>
+                  <Badge label="AWAITING RESULTS" color={C.amber}/>
+                </div>
+              )}
+
               {/* Tab bar */}
               <div style={{ display: "flex", gap: 4, marginBottom: 16, borderBottom: `2px solid ${C.border}`, paddingBottom: 0 }}>
                 {tabDef.map(t => (

@@ -15,13 +15,13 @@ async function seed() {
   if (!fs.existsSync(accountsFile)) {
     const raw = [
       { id:"USR001", username:"receptionist", password:"1234",  role:"receptionist", name:"Grace Nalwoga",        active:true  },
-      { id:"USR002", username:"doctor",        password:"1234",  role:"doctor",        name:"Dr. James Okello",     active:true  },
+      { id:"USR002", username:"doctor",        password:"1234",  role:"doctor",        name:"Dr Isaac",     active:true  },
       { id:"USR003", username:"nurse",         password:"1234",  role:"nurse",         name:"Amina Nabukeera",      active:true  },
       { id:"USR004", username:"lab",           password:"1234",  role:"lab",           name:"Peter Ssemwogerere",  active:true  },
       { id:"USR005", username:"pharmacy",      password:"1234",  role:"pharmacy",      name:"Lydia Nassuna",        active:true  },
       { id:"USR006", username:"dentist",       password:"1234",  role:"dentist",       name:"Dr. Faith Auma",       active:false },
-      { id:"USR007", username:"accountant",    password:"1234",  role:"accountant",    name:"Ruth Akello",          active:true  },
-      { id:"USR008", username:"director",      password:"1234",  role:"director",      name:"Prof. Simon Muwanga",  active:true  },
+      { id:"USR007", username:"accountant",    password:"1234",  role:"accountant",    name:"Pitua Emmanuel",          active:true  },
+      { id:"USR008", username:"director",      password:"1234",  role:"director",      name:"Pr Eric Sempa",  active:true  },
       { id:"USR009", username:"admin",         password:"admin", role:"admin",         name:"System Administrator", active:true  },
     ];
     const hashed = await Promise.all(raw.map(async a => ({ ...a, password: await bcrypt.hash(a.password, 10) })));

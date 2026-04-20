@@ -815,5 +815,221 @@
     "user": "doctor (doctor)",
     "action": "LOGIN_SUCCESS",
     "detail": {}
+  },
+  {
+    "id": "AUD1776366960976jf6",
+    "timestamp": "2026-04-16T19:16:00.998Z",
+    "user": "lab (lab)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776366978569ky2",
+    "timestamp": "2026-04-16T19:16:18.569Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17763669918995aq",
+    "timestamp": "2026-04-16T19:16:31.899Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776367048254r2r",
+    "timestamp": "2026-04-16T19:17:28.254Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17763670948859js",
+    "timestamp": "2026-04-16T19:18:14.885Z",
+    "user": "receptionist (receptionist)",
+    "action": "PATIENT_REGISTER",
+    "detail": {
+      "id": "HMS26-7356",
+      "name": "this is clean"
+    }
+  },
+  {
+    "id": "AUD17763671043582dh",
+    "timestamp": "2026-04-16T19:18:24.358Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17763671937971kg",
+    "timestamp": "2026-04-16T19:19:53.797Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17763673573274yh",
+    "timestamp": "2026-04-16T19:22:37.327Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17763675252843gt",
+    "timestamp": "2026-04-16T19:25:25.284Z",
+    "user": "doctor (doctor)",
+    "action": "PATIENT_UPDATE",
+    "detail": {
+      "id": "HMS26-4205"
+    }
+  },
+  {
+    "id": "AUD1776367555972yxi",
+    "timestamp": "2026-04-16T19:25:55.972Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776367969698491",
+    "timestamp": "2026-04-16T19:32:49.698Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776368044248i6f",
+    "timestamp": "2026-04-16T19:34:04.248Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776368053230tlc",
+    "timestamp": "2026-04-16T19:34:13.230Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776368089383a1d",
+    "timestamp": "2026-04-16T19:34:49.383Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "TRANSACTION",
+    "detail": {
+      "id": "TXN-20260416-138",
+      "amount": 20000,
+      "patient": "kobe khan"
+    }
+  },
+  {
+    "id": "AUD1776368374107rx4",
+    "timestamp": "2026-04-16T19:39:34.107Z",
+    "user": "lab (lab)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776368383083k23",
+    "timestamp": "2026-04-16T19:39:43.083Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776368451140uew",
+    "timestamp": "2026-04-16T19:40:51.140Z",
+    "user": "doctor (doctor)",
+    "action": "LAB_ORDER",
+    "detail": {
+      "test": "malaria parasite",
+      "patient": "bryant kalungi"
+    }
+  },
+  {
+    "id": "AUD17763685043725w9",
+    "timestamp": "2026-04-16T19:41:44.372Z",
+    "user": "nurse (nurse)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776368543196c2p",
+    "timestamp": "2026-04-16T19:42:23.196Z",
+    "user": "nurse (nurse)",
+    "action": "PATIENT_UPDATE",
+    "detail": {
+      "id": "HMS26-3062"
+    }
+  },
+  {
+    "id": "AUD17763685506543px",
+    "timestamp": "2026-04-16T19:42:30.654Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776368652604dl3",
+    "timestamp": "2026-04-16T19:44:12.604Z",
+    "user": "doctor (doctor)",
+    "action": "PATIENT_UPDATE",
+    "detail": {
+      "id": "HMS26-3062"
+    }
+  },
+  {
+    "id": "AUD1776368696532byl",
+    "timestamp": "2026-04-16T19:44:56.532Z",
+    "user": "lab (lab)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776368728439sg3",
+    "timestamp": "2026-04-16T19:45:28.439Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776368900925k6j",
+    "timestamp": "2026-04-16T19:48:20.925Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "TRANSACTION",
+    "detail": {
+      "id": "TXN-20260416-516",
+      "amount": 2000,
+      "patient": "bryant kalungi"
+    }
+  },
+  {
+    "id": "AUD177636890845953z",
+    "timestamp": "2026-04-16T19:48:28.459Z",
+    "user": "accountant (accountant)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776368998793khp",
+    "timestamp": "2026-04-16T19:49:58.793Z",
+    "user": "director (director)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776369065725mo6",
+    "timestamp": "2026-04-16T19:51:05.725Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776369262875lx7",
+    "timestamp": "2026-04-16T19:54:22.875Z",
+    "user": "admin (admin)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
   }
 ]

@@ -335,16 +335,37 @@
     "specialist": "Doctor"
   },
   {
-    "pendingVitals": {
-      "bp": "120/80",
-      "temp": "37",
-      "weight": "60",
-      "pulse": "78",
-      "spo2": "98",
-      "complaint": "headache",
-      "recordedAt": "06:24 PM"
-    },
-    "visits": [],
+    "pendingVitals": null,
+    "visits": [
+      {
+        "id": "V1776367525185",
+        "date": "2026-04-16",
+        "doctor": "Dr. James Okello",
+        "complaint": "headache",
+        "vitalsNote": "BP: 120/80  |  Temp: 37  |  Weight: 60  |  Pulse: 78  |  SpO₂: 98",
+        "labNote": "kobe Kan: Malaria",
+        "labResults": "kobe Kan: Malaria",
+        "diagnosis": "khan has malaria parasite ++",
+        "treatment": "coartem tablets",
+        "prescriptions": [
+          "coartem 500mgx5"
+        ],
+        "notes": "sleep under an mosquito net",
+        "vitals": {
+          "bp": "120/80",
+          "temp": "37",
+          "weight": "60",
+          "pulse": "78",
+          "spo2": "98",
+          "complaint": "headache",
+          "recordedAt": "06:24 PM"
+        },
+        "labOrders": [
+          "LAB1776353129815"
+        ],
+        "stage": "pharmacy"
+      }
+    ],
     "id": "HMS26-4205",
     "registeredAt": "2026-04-16",
     "name": "kobe khan",
@@ -362,7 +383,36 @@
   },
   {
     "pendingVitals": null,
-    "visits": [],
+    "visits": [
+      {
+        "id": "V1776368652587",
+        "date": "2026-04-16",
+        "doctor": "Dr. James Okello",
+        "complaint": "headache",
+        "vitalsNote": "BP: 120/80  |  Temp: 37  |  Weight: 76  |  Pulse: 78  |  SpO₂: 98",
+        "labNote": "headache: positive",
+        "labResults": "headache: positive",
+        "diagnosis": "Malaria parasite ++",
+        "treatment": "coartem, panadol",
+        "prescriptions": [
+          "he needs to take enough water"
+        ],
+        "notes": "",
+        "vitals": {
+          "bp": "120/80",
+          "temp": "37",
+          "weight": "76",
+          "pulse": "78",
+          "spo2": "98",
+          "complaint": "headache",
+          "recordedAt": "10:42 PM"
+        },
+        "labOrders": [
+          "LAB1776354230030"
+        ],
+        "stage": "pharmacy"
+      }
+    ],
     "id": "HMS26-3062",
     "registeredAt": "2026-04-16",
     "name": "bryant kalungi",
@@ -375,6 +425,24 @@
     "employeeId": "",
     "department": "",
     "emergencyContact": "",
+    "complaint": "headache",
+    "specialist": "Doctor"
+  },
+  {
+    "pendingVitals": null,
+    "visits": [],
+    "id": "HMS26-7356",
+    "registeredAt": "2026-04-16",
+    "name": "this is clean",
+    "dob": "2002-09-25",
+    "gender": "M",
+    "phone": "",
+    "category": "NSVS (Secondary)",
+    "class": "",
+    "dorm": "",
+    "employeeId": "",
+    "department": "",
+    "emergencyContact": "7664546757",
     "complaint": "headache",
     "specialist": "Doctor"
   }

@@ -38,5 +38,15 @@
     "patientName": "bryant kalungi",
     "test": "headache",
     "requestedBy": "Dr. James Okello"
+  },
+  {
+    "status": "pending",
+    "result": "",
+    "timestamp": "10:40 PM",
+    "id": "LAB1776368451125",
+    "patientId": "HMS26-3062",
+    "patientName": "bryant kalungi",
+    "test": "malaria parasite",
+    "requestedBy": "Dr. James Okello"
   }
 ]
