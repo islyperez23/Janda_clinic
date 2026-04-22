@@ -59,4 +59,19 @@ export const api = {
   getAudit:        (n=100)  => get(`/audit?limit=${n}`),
   // health
   health:          ()       => get("/health"),
+  // services / pricing
+  getServices:     ()       => get("/services"),
+  addService:      (d)      => post("/services", d),
+  updateService:   (id,d)   => patch(`/services/${id}`, d),
+  // bills
+  getBills:        ()       => get("/bills"),
+  getDebtors:      ()       => get("/bills/debtors"),
+  createBill:      (d)      => post("/bills", d),
+  payBill:         (id,d)   => post(`/bills/${id}/pay`, d),
+  // admissions
+  getAdmissions:   ()       => get("/admissions"),
+  admit:           (d)      => post("/admissions", d),
+  updateAdmission: (id,d)   => patch(`/admissions/${id}`, d),
+  addAdmissionNote:(id,n)   => post(`/admissions/${id}/notes`, { note:n }),
+  discharge:       (id,d)   => post(`/admissions/${id}/discharge`, d),
 };

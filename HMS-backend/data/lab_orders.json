@@ -48,5 +48,15 @@
     "patientName": "bryant kalungi",
     "test": "malaria parasite",
     "requestedBy": "Dr. James Okello"
+  },
+  {
+    "status": "pending",
+    "result": "",
+    "timestamp": "02:41 PM",
+    "id": "LAB1776858116450",
+    "patientId": "HMS26-7890",
+    "patientName": "tendo israel perez",
+    "test": "malar",
+    "requestedBy": "Dr. James Okello"
   }
 ]

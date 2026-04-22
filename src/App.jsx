@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
-import { UserPlus, ClipboardList, Search, DollarSign, Calendar, Activity, FileText, TestTube2, Heart, Pill, Package, BarChart2, TrendingUp, Users, Settings, LogOut, Bell, Zap, RefreshCw, Shield } from "lucide-react";
+import { UserPlus, ClipboardList, Search, DollarSign, Calendar, Activity, FileText, TestTube2, Heart, Pill, Package, BarChart2, TrendingUp, Users, Settings, LogOut, Bell, Zap, RefreshCw, Shield, AlertCircle } from "lucide-react";
 import { C, ROLES } from "./theme";
 import { api, setToken, clearToken } from "./api";
 
 // Page components
 import { PatientRegistration, QueueView, PatientSearch, OutpatientBilling, AppointmentsView } from "./pages/Reception";
-import { NurseVitals, PatientFile, DentistView, LabView, PharmacyView } from "./pages/Clinical";
+import { NurseVitals, PatientFile, PatientRecords, DentistView, LabView, PharmacyView } from "./pages/Clinical";
 import { InventoryView } from "./pages/Inventory";
 import { AccountantView } from "./pages/Finance";
-import { DirectorDashboard } from "./pages/Director";
+import { DirectorDashboard, InChargeDashboard } from "./pages/Director";
 import { AdminAccounts, AuditLog, ChangePassword, SystemSettings } from "./pages/Admin";
+import { ServicePriceList, PaymentCollector, DebtorsList } from "./pages/Billing";
+import { AdmittedPatients } from "./pages/Admissions";
 
 // ── Login Screen ──────────────────────────────────────────────────────────────
 function LoginScreen({ onLogin }) {
@@ -46,7 +48,7 @@ function LoginScreen({ onLogin }) {
         <div style={{ marginTop:22, padding:14, background:"rgba(255,255,255,0.04)", borderRadius:10, border:"1px solid rgba(255,255,255,0.07)" }}>
           <p style={{ color:"rgba(255,255,255,0.35)", fontSize:10, margin:"0 0 8px", fontWeight:700, letterSpacing:"0.08em" }}>DEMO — click to auto-fill (password: 1234)</p>
           <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
-            {[["receptionist","1234"],["doctor","1234"],["nurse","1234"],["lab","1234"],["pharmacy","1234"],["accountant","1234"],["director","1234"],["admin","admin"]].map(([u,p])=>(
+            {[["receptionist","1234"],["doctor","1234"],["incharge","1234"],["lab","1234"],["pharmacy","1234"],["accountant","1234"],["director","1234"],["admin","admin"]].map(([u,p])=>(
               <span key={u} onClick={()=>demo(u,p)} style={{ cursor:"pointer", background:"rgba(34,211,238,0.12)", color:C.accent, borderRadius:4, padding:"2px 8px", fontSize:10, fontWeight:600, border:"1px solid rgba(34,211,238,0.2)" }}>{u}</span>
             ))}
           </div>
@@ -57,7 +59,7 @@ function LoginScreen({ onLogin }) {
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
-function Sidebar({ user, activeTab, setTab, onLogout, queueCount, lowStockCount }) {
+function Sidebar({ user, activeTab, setTab, onLogout, queueCount, lowStockCount, admissions }) {
   const roleMenus = {
     receptionist:[
       { id:"register",     icon:<UserPlus size={15}/>,     label:"Register Patient" },
@@ -70,8 +72,9 @@ function Sidebar({ user, activeTab, setTab, onLogout, queueCount, lowStockCount 
     doctor:[
       { id:"myqueue",      icon:<Activity size={15}/>,      label:"My Queue", badge:queueCount },
       { id:"patientfile",  icon:<FileText size={15}/>,      label:"Patient File" },
+      { id:"admitted",     icon:<ClipboardList size={15}/>, label:"Admitted Patients", badge:admissions?.filter(a=>a.status==="admitted").length||0 },
+      { id:"records",      icon:<Search size={15}/>,        label:"Patient Records" },
       { id:"laborders",    icon:<TestTube2 size={15}/>,     label:"Lab Orders" },
-      { id:"search",       icon:<Search size={15}/>,        label:"Patient Search" },
       { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
     ],
     nurse:[
@@ -87,25 +90,41 @@ function Sidebar({ user, activeTab, setTab, onLogout, queueCount, lowStockCount 
     ],
     pharmacy:[
       { id:"pharmacyqueue",icon:<Pill size={15}/>,          label:"Prescriptions" },
+      { id:"billing",      icon:<DollarSign size={15}/>,   label:"Billing & Payments" },
       { id:"inventory",    icon:<Package size={15}/>,       label:"Drug Inventory", badge:lowStockCount||0 },
       { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
     ],
     dentist:[
       { id:"dentalqueue",  icon:<Activity size={15}/>,      label:"Dental Queue" },
+      { id:"admitted",     icon:<ClipboardList size={15}/>, label:"Admitted Patients" },
       { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
     ],
     accountant:[
       { id:"financials",   icon:<BarChart2 size={15}/>,     label:"Financial Reports" },
+      { id:"billing",      icon:<DollarSign size={15}/>,   label:"Bills & Payments" },
+      { id:"debtors",      icon:<AlertCircle size={15}/>,  label:"Debtors" },
+      { id:"services",     icon:<Package size={15}/>,       label:"Service Price List" },
       { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
     ],
     director:[
       { id:"dashboard",    icon:<BarChart2 size={15}/>,     label:"Dashboard" },
+      { id:"admitted",     icon:<ClipboardList size={15}/>, label:"Admitted Patients", badge:admissions?.filter(a=>a.status==="admitted").length||0 },
+      { id:"debtors",      icon:<AlertCircle size={15}/>,  label:"Debtors" },
       { id:"inventory",    icon:<Package size={15}/>,       label:"Stock Alerts", badge:lowStockCount||0 },
       { id:"audit",        icon:<Shield size={15}/>,        label:"Audit Log" },
       { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
     ],
+    incharge:[
+      { id:"incharge",     icon:<Activity size={15}/>,      label:"Live Overview" },
+      { id:"queue",        icon:<ClipboardList size={15}/>, label:"Patient Queue", badge:queueCount },
+      { id:"admitted",     icon:<ClipboardList size={15}/>, label:"Admitted Patients", badge:admissions?.filter(a=>a.status==="admitted").length||0 },
+      { id:"search",       icon:<Search size={15}/>,        label:"Patient Search" },
+      { id:"inventory",    icon:<Package size={15}/>,       label:"Stock Alerts", badge:lowStockCount||0 },
+      { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
+    ],
     admin:[
       { id:"accounts",     icon:<Users size={15}/>,         label:"Accounts" },
+      { id:"services",     icon:<Package size={15}/>,       label:"Service Price List" },
       { id:"audit",        icon:<Shield size={15}/>,        label:"Audit Log" },
       { id:"system",       icon:<Settings size={15}/>,      label:"System" },
       { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
@@ -217,6 +236,8 @@ export default function App() {
   const [transactions, setTransactions] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [inventory, setInventory] = useState([]);
+  const [bills, setBills]         = useState([]);
+  const [admissions, setAdmissions] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -230,9 +251,10 @@ export default function App() {
       const canAdmin = ["admin","director"].includes(currentUser.role);
       const canLab   = ["lab","doctor","dentist","director","admin"].includes(currentUser.role);
       const canFin   = ["receptionist","accountant","director","admin"].includes(currentUser.role);
+      const canBills = ["receptionist","pharmacy","accountant","director","incharge","admin"].includes(currentUser.role);
+      const canAdmit = ["doctor","dentist","incharge","director","admin"].includes(currentUser.role);
 
-      // allSettled means one failed request never blocks the others
-      const [p,q,qa,appt,inv,lab,txn,acc] = await Promise.allSettled([
+      const [p,q,qa,appt,inv,lab,txn,acc,bil,adm] = await Promise.allSettled([
         api.getPatients(),
         api.getQueue(),
         api.getQueueArchive(),
@@ -241,9 +263,10 @@ export default function App() {
         canLab   ? api.getLabOrders()    : Promise.resolve([]),
         canFin   ? api.getTransactions() : Promise.resolve([]),
         canAdmin ? api.getAccounts()     : Promise.resolve([]),
+        canBills ? api.getBills()        : Promise.resolve([]),
+        canAdmit ? api.getAdmissions()   : Promise.resolve([]),
       ]);
 
-      // Only update state for requests that succeeded
       const val = (r, fb=[]) => r.status === "fulfilled" ? r.value : fb;
       setPatients(val(p));
       setQueue(val(q));
@@ -253,9 +276,10 @@ export default function App() {
       setLabOrders(val(lab));
       setTransactions(val(txn));
       setAccounts(val(acc));
+      setBills(val(bil));
+      setAdmissions(val(adm));
 
-      // Log any failures so they're visible in dev console
-      [p,q,qa,appt,inv,lab,txn,acc].forEach((r,i) => {
+      [p,q,qa,appt,inv,lab,txn,acc,bil,adm].forEach((r,i) => {
         if (r.status === "rejected") console.warn(`loadData[${i}] failed:`, r.reason);
       });
     } catch(e){ console.error("loadData fatal:", e); } finally{ setLoading(false); }
@@ -268,7 +292,7 @@ export default function App() {
 
   const handleLogin = (user) => {
     setCurrentUser(user);
-    const defaults = { receptionist:"register", doctor:"myqueue", nurse:"vitals", lab:"labpending", pharmacy:"pharmacyqueue", accountant:"financials", director:"dashboard", admin:"accounts", dentist:"dentalqueue" };
+    const defaults = { receptionist:"register", doctor:"myqueue", nurse:"vitals", lab:"labpending", pharmacy:"pharmacyqueue", accountant:"financials", director:"dashboard", incharge:"incharge", admin:"accounts", dentist:"dentalqueue" };
     setActiveTab(defaults[user.role]||"");
   };
 
@@ -280,33 +304,41 @@ export default function App() {
 
   const tabTitle = {
     register:"Register Patient", queue:"Patient Queue",
-    billing:"Billing", search:"Patient Search",
-    appointments:"Appointments", myqueue:"My Queue", patientfile:"Patient File", laborders:"Lab Orders",
+    billing:"Bills & Payments", debtors:"Debtors List", services:"Service Price List",
+    search:"Patient Search", appointments:"Appointments",
+    myqueue:"My Queue", patientfile:"Patient File", laborders:"Lab Orders",
     vitals:"Record Vitals", labpending:"Pending Lab Tests", labresults:"Lab Results",
     pharmacyqueue:"Pharmacy Queue", inventory:"Drug Inventory", dentalqueue:"Dental Queue",
-    financials:"Financial Reports", dashboard:"Director Dashboard", accounts:"Manage Accounts",
-    audit:"Audit Log", system:"System Settings", changepw:"Change Password",
+    records:"Patient Records", admitted:"Admitted Patients",
+    financials:"Financial Reports", dashboard:"Director Dashboard",
+    incharge:"In-Charge Live Overview",
+    accounts:"Manage Accounts", audit:"Audit Log", system:"System Settings", changepw:"Change Password",
   };
 
   const renderContent = () => {
-    const props = { patients, setPatients, queue, queueArchive, labOrders, transactions, accounts, inventory, appointments, selectedPatient, setSelectedPatient, setTab:setActiveTab, user:currentUser, reload:loadData };
+    const props = { patients, setPatients, queue, queueArchive, labOrders, transactions, accounts, inventory, appointments, bills, setBills, admissions, selectedPatient, setSelectedPatient, setTab:setActiveTab, user:currentUser, reload:loadData };
     switch(activeTab) {
       case "register":      return <PatientRegistration {...props}/>;
       case "queue":
       case "myqueue":       return <QueueView {...props} userRole={currentUser.role}/>;
-      case "billing":       return <OutpatientBilling {...props}/>;
       case "search":        return <PatientSearch {...props} userRole={currentUser.role}/>;
       case "appointments":  return <AppointmentsView {...props}/>;
       case "vitals":        return <NurseVitals {...props}/>;
       case "patientfile":
       case "laborders":     return <PatientFile {...props}/>;
+      case "records":       return <PatientRecords {...props}/>;
+      case "admitted":      return <AdmittedPatients admissions={admissions} patients={patients} user={currentUser} isDoctor={["doctor","dentist"].includes(currentUser.role)} reload={loadData}/>;
       case "dentalqueue":   return <DentistView {...props}/>;
       case "labpending":
       case "labresults":    return <LabView {...props} queue={queue}/>;
       case "pharmacyqueue": return <PharmacyView {...props} user={currentUser}/>;
+      case "billing":       return <PaymentCollector bills={bills} setBills={setBills} user={currentUser}/>;
+      case "debtors":       return <DebtorsList bills={bills}/>;
+      case "services":      return <ServicePriceList/>;
       case "inventory":     return <InventoryView {...props}/>;
       case "financials":    return <AccountantView {...props}/>;
       case "dashboard":     return <DirectorDashboard {...props}/>;
+      case "incharge":      return <InChargeDashboard {...props}/>;
       case "accounts":      return <AdminAccounts {...props}/>;
       case "audit":         return <AuditLog/>;
       case "changepw":      return <ChangePassword user={currentUser}/>;
@@ -326,7 +358,7 @@ export default function App() {
         @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
       `}</style>
 
-      <Sidebar user={currentUser} activeTab={activeTab} setTab={setActiveTab} onLogout={handleLogout} queueCount={queueCount} lowStockCount={lowStockCount}/>
+      <Sidebar user={currentUser} activeTab={activeTab} setTab={setActiveTab} onLogout={handleLogout} queueCount={queueCount} lowStockCount={lowStockCount} admissions={admissions}/>
 
       <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
         {["accountant","director"].includes(currentUser.role) && (

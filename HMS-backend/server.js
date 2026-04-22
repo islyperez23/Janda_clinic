@@ -80,7 +80,7 @@ app.use("/api", apiLimiter);
 // ── PATIENTS ──────────────────────────────────────────────────────────────────
 app.get("/api/patients", requireAuth, (_req, res) => ok(res, db.patients.all()));
 
-app.post("/api/patients", requireAuth, requireRole("receptionist","pharmacy","admin"), (req, res) => {
+app.post("/api/patients", requireAuth, requireRole("receptionist","admin"), (req, res) => {
   const e = requireFields(req.body, ["id","name","category","gender"]);
   if (e) return fail(res, e);
   const patient = { pendingVitals:null, visits:[], ...req.body };
@@ -271,7 +271,7 @@ app.patch("/api/accounts/:id/password", requireAuth, async (req, res) => {
 // ── APPOINTMENTS ──────────────────────────────────────────────────────────────
 app.get("/api/appointments", requireAuth, (_req, res) => ok(res, db.appointments.all()));
 
-app.post("/api/appointments", requireAuth, requireRole("receptionist","pharmacy","admin"), (req, res) => {
+app.post("/api/appointments", requireAuth, requireRole("receptionist","admin"), (req, res) => {
   const e = requireFields(req.body, ["patientId","date"]);
   if (e) return fail(res, e);
   const appt = { id:`APT${Date.now()}`, status:"scheduled", ...req.body };
@@ -279,7 +279,7 @@ app.post("/api/appointments", requireAuth, requireRole("receptionist","pharmacy"
   ok(res, appt, 201);
 });
 
-app.patch("/api/appointments/:id", requireAuth, requireRole("receptionist","pharmacy","admin"), (req, res) => {
+app.patch("/api/appointments/:id", requireAuth, requireRole("receptionist","admin"), (req, res) => {
   const updated = db.appointments.update(a => a.id === req.params.id, a => ({ ...a, ...req.body }));
   if (!updated) return fail(res, "Appointment not found.", 404);
   ok(res, updated);
@@ -304,3 +304,168 @@ app.listen(PORT, () => {
   console.log(`\n🏥  HMS Backend  →  http://localhost:${PORT}`);
   console.log(`    Health       →  http://localhost:${PORT}/api/health\n`);
 });
+
+// ── NEW COLLECTIONS ────────────────────────────────────────────────────────────
+const db2 = {
+  services:   new (require("./db").Collection)("services",   []),
+  bills:      new (require("./db").Collection)("bills",      []),
+  admissions: new (require("./db").Collection)("admissions", []),
+};
+
+// ── SERVICE PRICE LIST ────────────────────────────────────────────────────────
+app.get("/api/services", requireAuth, (_req, res) => ok(res, db2.services.all()));
+
+app.post("/api/services", requireAuth, requireRole("admin","accountant"), (req, res) => {
+  const e = requireFields(req.body, ["name","price"]);
+  if (e) return fail(res, e);
+  const svc = { id:`SVC${Date.now()}`, active:true, category:"General", ...req.body };
+  db2.services.insert(svc);
+  ok(res, svc, 201);
+});
+
+app.patch("/api/services/:id", requireAuth, requireRole("admin","accountant"), (req, res) => {
+  const updated = db2.services.update(s => s.id === req.params.id, s => ({ ...s, ...req.body }));
+  if (!updated) return fail(res, "Service not found.", 404);
+  ok(res, updated);
+});
+
+// ── BILLS (partial payment support) ───────────────────────────────────────────
+app.get("/api/bills", requireAuth,
+  requireRole("receptionist","pharmacy","accountant","director","incharge","admin"),
+  (_req, res) => ok(res, db2.bills.all())
+);
+
+app.get("/api/bills/debtors", requireAuth,
+  requireRole("accountant","director","incharge","admin"),
+  (_req, res) => {
+    const unpaid = db2.bills.find(b => b.status !== "paid");
+    ok(res, unpaid);
+  }
+);
+
+app.post("/api/bills", requireAuth,
+  requireRole("receptionist","pharmacy","admin"),
+  (req, res) => {
+    const e = requireFields(req.body, ["patientId","patientName","services","totalAmount"]);
+    if (e) return fail(res, e);
+    const bill = {
+      id:          `BILL${Date.now()}`,
+      date:        todayStr(),
+      amountPaid:  0,
+      balance:     req.body.totalAmount,
+      status:      "unpaid",   // unpaid | partial | paid
+      payments:    [],
+      createdBy:   req.user?.name || "",
+      ...req.body,
+    };
+    db2.bills.insert(bill);
+    audit(req.user, "BILL_CREATED", { id:bill.id, patient:bill.patientName, total:bill.totalAmount });
+    ok(res, bill, 201);
+  }
+);
+
+app.post("/api/bills/:id/pay", requireAuth,
+  requireRole("receptionist","pharmacy","accountant","admin"),
+  (req, res) => {
+    const { amount, method, cashier } = req.body;
+    if (!amount || amount <= 0) return fail(res, "Payment amount must be positive.");
+
+    const updated = db2.bills.update(b => b.id === req.params.id, b => {
+      const paid    = b.amountPaid + Number(amount);
+      const balance = b.totalAmount - paid;
+      const status  = balance <= 0 ? "paid" : paid > 0 ? "partial" : "unpaid";
+      return {
+        ...b,
+        amountPaid: paid,
+        balance:    Math.max(0, balance),
+        status,
+        payments: [...(b.payments||[]), {
+          amount: Number(amount), method: method||"Cash",
+          cashier: cashier||req.user?.name||"",
+          timestamp: nowStr(), date: todayStr()
+        }]
+      };
+    });
+    if (!updated) return fail(res, "Bill not found.", 404);
+    audit(req.user, "BILL_PAYMENT", { billId:req.params.id, amount, method, balance:updated.balance });
+    ok(res, updated);
+  }
+);
+
+// ── ADMISSIONS ─────────────────────────────────────────────────────────────────
+app.get("/api/admissions", requireAuth,
+  requireRole("doctor","dentist","incharge","director","admin"),
+  (_req, res) => ok(res, db2.admissions.all())
+);
+
+app.post("/api/admissions", requireAuth,
+  requireRole("doctor","dentist","admin"),
+  (req, res) => {
+    const e = requireFields(req.body, ["patientId","patientName","ward","reason"]);
+    if (e) return fail(res, e);
+    const admission = {
+      id:            `ADM${Date.now()}`,
+      admittedDate:  todayStr(),
+      admittedTime:  nowStr(),
+      admittedBy:    req.user?.name || "",
+      status:        "admitted",   // admitted | discharged
+      dischargedDate: null,
+      dischargedTime: null,
+      dischargeReport: null,
+      notes:         "",
+      dailyNotes:    [],
+      ...req.body,
+    };
+    db2.admissions.insert(admission);
+    audit(req.user, "PATIENT_ADMITTED", { id:admission.id, patient:admission.patientName, ward:admission.ward });
+    ok(res, admission, 201);
+  }
+);
+
+app.patch("/api/admissions/:id", requireAuth,
+  requireRole("doctor","dentist","incharge","admin"),
+  (req, res) => {
+    const updated = db2.admissions.update(a => a.id === req.params.id, a => ({ ...a, ...req.body }));
+    if (!updated) return fail(res, "Admission not found.", 404);
+    ok(res, updated);
+  }
+);
+
+// Add a daily progress note to an admission
+app.post("/api/admissions/:id/notes", requireAuth,
+  requireRole("doctor","dentist","incharge","admin"),
+  (req, res) => {
+    const { note } = req.body;
+    if (!note?.trim()) return fail(res, "Note text is required.");
+    const updated = db2.admissions.update(a => a.id === req.params.id, a => ({
+      ...a,
+      dailyNotes: [...(a.dailyNotes||[]), {
+        text: note, author: req.user?.name||"", date: todayStr(), time: nowStr()
+      }]
+    }));
+    if (!updated) return fail(res, "Admission not found.", 404);
+    ok(res, updated);
+  }
+);
+
+app.post("/api/admissions/:id/discharge", requireAuth,
+  requireRole("doctor","dentist","admin"),
+  (req, res) => {
+    const e = requireFields(req.body, ["dischargeReport"]);
+    if (e) return fail(res, e);
+    const updated = db2.admissions.update(a => a.id === req.params.id, a => ({
+      ...a,
+      status:        "discharged",
+      dischargedDate: todayStr(),
+      dischargedTime: nowStr(),
+      dischargedBy:  req.user?.name||"",
+      dischargeReport: req.body.dischargeReport,
+      finalDiagnosis:  req.body.finalDiagnosis||"",
+      outcome:         req.body.outcome||"",
+      followUp:        req.body.followUp||"",
+    }));
+    if (!updated) return fail(res, "Admission not found.", 404);
+    audit(req.user, "PATIENT_DISCHARGED", { id:req.params.id, patient:updated.patientName });
+    ok(res, updated);
+  }
+);

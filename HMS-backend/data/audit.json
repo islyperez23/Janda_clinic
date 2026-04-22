@@ -1031,5 +1031,249 @@
     "user": "admin (admin)",
     "action": "LOGIN_SUCCESS",
     "detail": {}
+  },
+  {
+    "id": "AUD1776683183791pw5",
+    "timestamp": "2026-04-20T11:06:23.791Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776836897242ish",
+    "timestamp": "2026-04-22T05:48:17.242Z",
+    "user": "anonymous",
+    "action": "LOGIN_FAIL",
+    "detail": {
+      "username": "incharge"
+    }
+  },
+  {
+    "id": "AUD17768369016602o1",
+    "timestamp": "2026-04-22T05:48:21.660Z",
+    "user": "anonymous",
+    "action": "LOGIN_FAIL",
+    "detail": {
+      "username": "incharge"
+    }
+  },
+  {
+    "id": "AUD1776836928849oai",
+    "timestamp": "2026-04-22T05:48:48.849Z",
+    "user": "nurse (nurse)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776836956032vpe",
+    "timestamp": "2026-04-22T05:49:16.032Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776837247301nx4",
+    "timestamp": "2026-04-22T05:54:07.301Z",
+    "user": "anonymous",
+    "action": "LOGIN_FAIL",
+    "detail": {
+      "username": "incharge"
+    }
+  },
+  {
+    "id": "AUD1776837423516lgt",
+    "timestamp": "2026-04-22T05:57:03.516Z",
+    "user": "admin (admin)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776837482246ujk",
+    "timestamp": "2026-04-22T05:58:02.246Z",
+    "user": "admin (admin)",
+    "action": "ACCOUNT_CREATE",
+    "detail": {
+      "username": "In-charge",
+      "role": "incharge"
+    }
+  },
+  {
+    "id": "AUD1776837495552s3p",
+    "timestamp": "2026-04-22T05:58:15.552Z",
+    "user": "anonymous",
+    "action": "LOGIN_FAIL",
+    "detail": {
+      "username": "incharge"
+    }
+  },
+  {
+    "id": "AUD1776837507397dqi",
+    "timestamp": "2026-04-22T05:58:27.397Z",
+    "user": "anonymous",
+    "action": "LOGIN_FAIL",
+    "detail": {
+      "username": "Incharge"
+    }
+  },
+  {
+    "id": "AUD1776837508809vqr",
+    "timestamp": "2026-04-22T05:58:28.809Z",
+    "user": "anonymous",
+    "action": "LOGIN_FAIL",
+    "detail": {
+      "username": "Incharge"
+    }
+  },
+  {
+    "id": "AUD1776837509897e31",
+    "timestamp": "2026-04-22T05:58:29.897Z",
+    "user": "anonymous",
+    "action": "LOGIN_FAIL",
+    "detail": {
+      "username": "Incharge"
+    }
+  },
+  {
+    "id": "AUD1776837529271bz6",
+    "timestamp": "2026-04-22T05:58:49.271Z",
+    "user": "anonymous",
+    "action": "LOGIN_FAIL",
+    "detail": {
+      "username": "Incharge"
+    }
+  },
+  {
+    "id": "AUD17768375323385uv",
+    "timestamp": "2026-04-22T05:58:52.338Z",
+    "user": "admin (admin)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17768375736244bm",
+    "timestamp": "2026-04-22T05:59:33.624Z",
+    "user": "In-charge (incharge)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17768376565748l8",
+    "timestamp": "2026-04-22T06:00:56.574Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776837678528mk9",
+    "timestamp": "2026-04-22T06:01:18.528Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17768377158520fw",
+    "timestamp": "2026-04-22T06:01:55.852Z",
+    "user": "doctor (doctor)",
+    "action": "PATIENT_UPDATE",
+    "detail": {
+      "id": "HMS26-7356"
+    }
+  },
+  {
+    "id": "AUD1776839105616sch",
+    "timestamp": "2026-04-22T06:25:05.616Z",
+    "user": "accountant (accountant)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776841047724psj",
+    "timestamp": "2026-04-22T06:57:27.724Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776854165976j1u",
+    "timestamp": "2026-04-22T10:36:05.976Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776857156057vgd",
+    "timestamp": "2026-04-22T11:25:56.057Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776857182152fmn",
+    "timestamp": "2026-04-22T11:26:22.152Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776857373083c3o",
+    "timestamp": "2026-04-22T11:29:33.083Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776857392634vyv",
+    "timestamp": "2026-04-22T11:29:52.634Z",
+    "user": "In-charge (incharge)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17768574108273mv",
+    "timestamp": "2026-04-22T11:30:10.827Z",
+    "user": "director (director)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776857428436sl3",
+    "timestamp": "2026-04-22T11:30:28.436Z",
+    "user": "accountant (accountant)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776857588325lc3",
+    "timestamp": "2026-04-22T11:33:08.325Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776857809064op7",
+    "timestamp": "2026-04-22T11:36:49.064Z",
+    "user": "receptionist (receptionist)",
+    "action": "PATIENT_REGISTER",
+    "detail": {
+      "id": "HMS26-7890",
+      "name": "tendo israel perez"
+    }
+  },
+  {
+    "id": "AUD1776857821960di0",
+    "timestamp": "2026-04-22T11:37:01.960Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17768581165247bx",
+    "timestamp": "2026-04-22T11:41:56.524Z",
+    "user": "doctor (doctor)",
+    "action": "LAB_ORDER",
+    "detail": {
+      "test": "malar",
+      "patient": "tendo israel perez"
+    }
   }
 ]

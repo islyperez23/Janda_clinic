@@ -3,6 +3,7 @@ import { Heart, FileText, TestTube2, Upload, CheckCircle, Printer, ArrowRight, C
 import { C, now, today, genLab } from "../theme";
 import { Badge, Btn, Input, Select, Textarea, Card, EmptyState, StageBadge } from "../ui";
 import { api } from "../api";
+import { AdmitForm } from "./Admissions";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PRINT REPORT
@@ -105,16 +106,14 @@ export function NurseVitals({ patients, queue, reload }) {
   const tempW = form.temp && parseFloat(form.temp) >= 38.5
     ? { msg: `⚠ Fever (${form.temp})`, color: C.red }
     : form.temp && parseFloat(form.temp) >= 37.5
-    ? { msg: "↑ Elevated temperature", color: C.amber } : null;
+    ? { msg: "↑ Elevated", color: C.amber } : null;
 
   const save = async () => {
     if (!pid) { alert("Select a patient first."); return; }
     if (!form.bp && !form.temp && !form.weight) { alert("Enter at least BP, temperature or weight."); return; }
     setSaving(true);
     try {
-      // Store vitals on the patient record
       await api.updatePatient(pid, { pendingVitals: { ...form, recordedAt: now() } });
-      // Return patient to doctor queue
       const inQueue = queue.find(e => e.patientId === pid);
       if (inQueue) await api.updateQueue(pid, { stage: "doctor", nurseResultsReady: true });
       setForm({ bp:"", temp:"", weight:"", pulse:"", spo2:"", complaint:"" });
@@ -125,9 +124,8 @@ export function NurseVitals({ patients, queue, reload }) {
 
   return (
     <div style={{ padding: 24, display: "grid", gridTemplateColumns: "280px 1fr", gap: 20 }}>
-      {/* Left: queue */}
       <div>
-        <Card title={`Patients for Vitals (${nurseQueue.length})`} style={{ marginBottom: 12 }}>
+        <Card title={`Waiting for Vitals (${nurseQueue.length})`} style={{ marginBottom: 12 }}>
           {nurseQueue.length === 0
             ? <EmptyState icon="✅" message="No patients waiting for vitals" />
             : nurseQueue.map(e => (
@@ -146,7 +144,7 @@ export function NurseVitals({ patients, queue, reload }) {
               <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, marginBottom: 4 }}>{patient.id}</div>
               <div>DOB: {patient.dob || "—"}</div>
               <div>Gender: {patient.gender || "—"}</div>
-              {patient.class && <div>Class: {patient.class}{patient.dorm && ` · ${patient.dorm}`}</div>}
+              {patient.class && <div>Class: {patient.class}</div>}
               <div style={{ fontSize: 11, marginTop: 6 }}>📞 {patient.emergencyContact || "—"}</div>
             </div>
             {patient.visits?.length > 0 && (
@@ -154,7 +152,7 @@ export function NurseVitals({ patients, queue, reload }) {
                 <div style={{ fontWeight: 700, color: C.accent, marginBottom: 4 }}>Last Visit Vitals</div>
                 {(() => { const v = patient.visits.slice(-1)[0]?.vitals || {}; return (
                   <div style={{ color: C.textMid }}>
-                    {[["BP",v.bp],["Temp",v.temp],["Weight",v.weight],["Pulse",v.pulse]].filter(([,x])=>x).map(([k,x])=>`${k}: ${x}`).join("  ·  ") || "No previous vitals"}
+                    {[["BP",v.bp],["Temp",v.temp],["Weight",v.weight],["Pulse",v.pulse]].filter(([,x])=>x).map(([k,x])=>`${k}: ${x}`).join(" · ") || "No previous vitals"}
                   </div>
                 );})()}
               </div>
@@ -162,34 +160,79 @@ export function NurseVitals({ patients, queue, reload }) {
           </Card>
         )}
       </div>
-
-      {/* Right: vitals form */}
       <Card title="Record Vitals">
-        {!pid
-          ? <EmptyState icon="👤" message="Select a patient from the list on the left" />
-          : (
-            <>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
-                <div>
-                  <Input label="Blood Pressure (mmHg)" value={form.bp} onChange={v => set("bp", v)} placeholder="e.g. 120/80" />
-                  {bpW && <div style={{ fontSize: 11, color: bpW.color, marginTop: 3, fontWeight: 700 }}>{bpW.msg}</div>}
-                </div>
-                <div>
-                  <Input label="Temperature (°C)" value={form.temp} onChange={v => set("temp", v)} placeholder="e.g. 37.0" />
-                  {tempW && <div style={{ fontSize: 11, color: tempW.color, marginTop: 3, fontWeight: 700 }}>{tempW.msg}</div>}
-                </div>
-                <Input label="Weight (kg)" value={form.weight} onChange={v => set("weight", v)} placeholder="e.g. 60" />
-                <Input label="Pulse (bpm)" value={form.pulse} onChange={v => set("pulse", v)} placeholder="e.g. 72" />
-                <Input label="SpO₂ (%)" value={form.spo2} onChange={v => set("spo2", v)} placeholder="e.g. 98" />
-                <Input label="Confirm Chief Complaint" value={form.complaint} onChange={v => set("complaint", v)} placeholder="Patient's complaint" />
+        {!pid ? <EmptyState icon="👤" message="Select a patient from the list on the left" /> : (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+              <div>
+                <Input label="Blood Pressure (mmHg)" value={form.bp} onChange={v => set("bp", v)} placeholder="e.g. 120/80" />
+                {bpW && <div style={{ fontSize: 11, color: bpW.color, marginTop: 3, fontWeight: 700 }}>{bpW.msg}</div>}
               </div>
-              <Btn onClick={save} color={C.purple} disabled={saving}>
-                <Heart size={13} /> {saving ? "Saving…" : "Save Vitals & Return to Doctor"}
-              </Btn>
-            </>
-          )}
+              <div>
+                <Input label="Temperature (°C)" value={form.temp} onChange={v => set("temp", v)} placeholder="e.g. 37.0" />
+                {tempW && <div style={{ fontSize: 11, color: tempW.color, marginTop: 3, fontWeight: 700 }}>{tempW.msg}</div>}
+              </div>
+              <Input label="Weight (kg)" value={form.weight} onChange={v => set("weight", v)} placeholder="e.g. 60" />
+              <Input label="Pulse (bpm)" value={form.pulse} onChange={v => set("pulse", v)} placeholder="e.g. 72" />
+              <Input label="SpO₂ (%)" value={form.spo2} onChange={v => set("spo2", v)} placeholder="e.g. 98" />
+              <Input label="Confirm Complaint" value={form.complaint} onChange={v => set("complaint", v)} placeholder="Patient's complaint" />
+            </div>
+            <Btn onClick={save} color={C.purple} disabled={saving}>
+              <Heart size={13} /> {saving ? "Saving…" : "Save Vitals & Return to Doctor"}
+            </Btn>
+          </>
+        )}
       </Card>
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PATIENT RECORDS SEARCH — doctor can look up any patient's history
+// ─────────────────────────────────────────────────────────────────────────────
+function PatientRecordsSearch({ patients, pid, selectPatient }) {
+  const [q, setQ] = useState("");
+  const results = q.trim()
+    ? patients.filter(p =>
+        p.name.toLowerCase().includes(q.toLowerCase()) ||
+        p.id.toLowerCase().includes(q.toLowerCase())
+      ).slice(0, 6)
+    : [];
+
+  return (
+    <Card title="Patient Records">
+      <div style={{ position: "relative", marginBottom: results.length ? 8 : 0 }}>
+        <span style={{ position:"absolute", left:9, top:"50%", transform:"translateY(-50%)", fontSize:13, color:C.textLight, pointerEvents:"none" }}>🔍</span>
+        <input
+          value={q}
+          onChange={e => setQ(e.target.value)}
+          placeholder="Search by name or ID…"
+          style={{ width:"100%", padding:"7px 9px 7px 28px", border:`1.5px solid ${C.border}`, borderRadius:7, fontSize:12, fontFamily:"inherit", boxSizing:"border-box", background:"#f8fafc" }}
+        />
+        {q && <button onClick={() => setQ("")} style={{ position:"absolute", right:7, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color:C.textLight, fontSize:16 }}>×</button>}
+      </div>
+      {results.length > 0 && (
+        <div style={{ maxHeight: 200, overflowY:"auto" }}>
+          {results.map(p => (
+            <div key={p.id} onClick={() => { selectPatient(p.id); setQ(""); }}
+              style={{ padding:"8px 6px", borderRadius:7, cursor:"pointer", borderBottom:`1px solid ${C.border}`, background: pid===p.id ? C.greenLight : "transparent" }}>
+              <div style={{ fontWeight:600, fontSize:13, color:C.text }}>{p.name}</div>
+              <div style={{ fontSize:10, color:C.textMid, fontFamily:"'IBM Plex Mono',monospace" }}>
+                {p.id} · {p.visits?.length||0} visit{p.visits?.length!==1?"s":""} · {p.category}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {q && results.length === 0 && (
+        <div style={{ fontSize:12, color:C.textLight, textAlign:"center", paddingTop:8 }}>No patients found</div>
+      )}
+      {!q && (
+        <div style={{ fontSize:11, color:C.textLight, textAlign:"center", paddingTop:4 }}>
+          Type a name or ID to find any patient's records
+        </div>
+      )}
+    </Card>
   );
 }
 
@@ -197,41 +240,43 @@ export function NurseVitals({ patients, queue, reload }) {
 // DOCTOR PATIENT FILE  — full tabbed consultation workflow
 //
 // Tabs:
-//   📋 Queue          — current patients assigned to doctor
-//   🩺 Nurse Results  — vitals returned from nurse (confirm → auto-fill form)
-//   🔬 Lab Results    — lab results returned from lab (confirm → auto-fill form)
-//   📝 Consultation   — write diagnosis, prescriptions, save + print report
+//   📝 Consultation   — write diagnosis, prescriptions, save + print
+//   🩺 Nurse Results  — vitals from nurse (confirm → auto-fill form)
+//   🔬 Lab Results    — lab results (confirm → auto-fill form)
 //   📚 Visit History  — all past visits
 // ─────────────────────────────────────────────────────────────────────────────
 export function PatientFile({ patients, queue, labOrders, user, reload }) {
   const [pid, setPid] = useState("");
-  const [tab, setTab] = useState("consultation"); // consultation | nurse | lab | history
+  const [tab, setTab] = useState("consultation");
   const [form, setForm] = useState({
     complaint: "", vitalsNote: "", labNote: "",
     diagnosis: "", treatment: "", prescriptions: "", notes: "", sendTo: ""
   });
   const [labTest, setLabTest] = useState("");
   const [saving, setSaving] = useState(false);
+  const [showAdmitForm, setShowAdmitForm] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const myQueue = queue.filter(e => e.stage === "doctor");
-  // All patients the doctor is tracking (includes ones temporarily at lab/nurse)
+  // All patients the doctor is tracking (includes ones at nurse or lab)
   const allMyPatients = queue.filter(e => ["doctor","nurse","lab"].includes(e.stage));
   const patient = patients.find(p => p.id === pid);
   const pendingVitals = patient?.pendingVitals;
 
-  // Lab results for this patient (completed orders)
   const myLabResults = labOrders.filter(o => o.patientId === pid && o.status === "completed");
-  // Pending lab orders for this patient
   const myLabPending = labOrders.filter(o => o.patientId === pid && o.status === "pending");
 
-  // Track whether patient is still in doctor's queue
-  const stillInQueue = !!queue.find(e => e.patientId === pid && e.stage === "doctor");
-
+  const stillInQueue  = !!queue.find(e => e.patientId === pid && e.stage === "doctor");
   const hasNurseResults = !!pendingVitals;
   const hasLabResults   = myLabResults.length > 0;
 
-  // When a different patient is selected, reset form and go to consultation tab
+  const tabDef = [
+    { id:"consultation", label:"📝 Consultation" },
+    { id:"nurse",        label:`🩺 Nurse Results${hasNurseResults?" 🔴":""}` },
+    { id:"lab",          label:`🔬 Lab Results${hasLabResults?" 🔴":""}` },
+    { id:"history",      label:"📚 Visit History" },
+  ];
+
   const selectPatient = (newPid) => {
     setPid(newPid);
     setTab("consultation");
@@ -288,6 +333,11 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
     if (!form.diagnosis.trim()) { alert("Diagnosis is required before saving the report."); return; }
     if (!form.sendTo) { alert("Please select where to route the patient (Pharmacy or Done)."); return; }
     setSaving(true);
+
+    // Capture these before clearing form
+    const savedPid     = pid;
+    const savedPatient = patient;
+
     try {
       const visit = {
         id:     `V${Date.now()}`,
@@ -296,7 +346,7 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
         complaint:     form.complaint,
         vitalsNote:    form.vitalsNote,
         labNote:       form.labNote,
-        labResults:    form.labNote, // duplicate for print/display
+        labResults:    form.labNote,
         diagnosis:     form.diagnosis,
         treatment:     form.treatment,
         prescriptions: form.prescriptions.split("\n").filter(Boolean),
@@ -305,83 +355,99 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
         labOrders:     myLabResults.map(o => o.id),
         stage:         form.sendTo,
       };
-      await api.updatePatient(pid, { addVisit: visit, clearPendingVitals: true });
-      const inQueue = queue.find(e => e.patientId === pid);
-      if (inQueue) await api.updateQueue(pid, { stage: form.sendTo });
 
-      // Offer to print immediately
-      if (window.confirm("Visit saved! Print the report now?")) {
-        printReport(patient, visit);
+      await api.updatePatient(savedPid, { addVisit: visit, clearPendingVitals: true });
+      const inQueue = queue.find(e => e.patientId === savedPid);
+
+      if (form.sendTo === "admit") {
+        // Remove from queue — admission system takes over
+        if (inQueue) await api.updateQueue(savedPid, { stage: "done" });
+      } else if (form.sendTo && inQueue) {
+        await api.updateQueue(savedPid, { stage: form.sendTo });
       }
 
+      // Reset form but KEEP the patient selected so history is visible
+      const wasAdmit = form.sendTo === "admit";
       setForm({ complaint:"", vitalsNote:"", labNote:"", diagnosis:"", treatment:"", prescriptions:"", notes:"", sendTo:"" });
-      setPid("");
-      reload();
+
+      // Switch to History tab BEFORE reload
+      setTab("history");
+
+      // Reload — pid stays set so the freshly loaded patient is still selected
+      await reload();
+
+      if (wasAdmit) {
+        // Open the admission form immediately
+        setShowAdmitForm(true);
+      } else if (window.confirm("Report saved and filed ✓\n\nPrint the patient report now?")) {
+        printReport(savedPatient, visit);
+      }
+
     } catch(e) { alert(e.message); } finally { setSaving(false); }
   };
 
-  // ── Tab bar ──────────────────────────────────────────────────────────────
-  const tabDef = [
-    { id:"consultation", label:"📝 Consultation" },
-    { id:"nurse",        label:`🩺 Nurse Results${hasNurseResults?" 🔴":""}` },
-    { id:"lab",          label:`🔬 Lab Results${hasLabResults?" 🔴":""}` },
-    { id:"history",      label:"📚 Visit History" },
-  ];
-
   return (
-    <div style={{ padding: 24, display: "grid", gridTemplateColumns: "260px 1fr", gap: 18 }}>
-
-      {/* ── Left: queue + patient card ── */}
-      <div>
-        <Card title={`My Patients (${allMyPatients.length})`} style={{ marginBottom: 12 }}>
+    <>
+      {/* AdmitForm modal — opens after doctor saves with sendTo:"admit" */}
+      {showAdmitForm && patient && (
+        <AdmitForm patient={patient} queue={queue} user={user} reload={reload} onClose={() => setShowAdmitForm(false)}/>
+      )}
+      <div style={{ padding: 24, display: "grid", gridTemplateColumns: "260px 1fr", gap: 18 }}>
+      <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+        <Card title={`Active Patients (${allMyPatients.length})`}>
           {allMyPatients.length === 0
-            ? <EmptyState icon="✅" message="No patients assigned to you" />
+            ? <EmptyState icon="✅" message="No patients in queue" />
             : allMyPatients.map(e => (
               <div key={e.patientId} onClick={() => selectPatient(e.patientId)}
                 style={{ padding: "9px 10px", borderRadius: 8, border: `1.5px solid ${pid === e.patientId ? C.green : C.border}`, cursor: "pointer", marginBottom: 6, background: pid === e.patientId ? "rgba(16,185,129,0.08)" : "transparent", position: "relative" }}>
                 <div style={{ fontWeight: 700, fontSize: 13 }}>{e.name}</div>
                 <div style={{ fontSize: 10, color: C.textMid, fontFamily: "'IBM Plex Mono',monospace" }}>{e.patientId}</div>
                 <div style={{ fontSize: 11, color: C.textLight, marginTop: 2 }}>{e.complaint}</div>
-                {e.stage !== "doctor" && (
-                  <div style={{ position: "absolute", top: 6, right: 8, background: e.stage==="lab"?C.amber:C.purple, color: "#fff", borderRadius: 10, padding: "1px 6px", fontSize: 9, fontWeight: 700, textTransform:"uppercase" }}>
-                    {e.stage==="lab"?"AT LAB":"AT NURSE"}
-                  </div>
+                {e.stage === "lab" && (
+                  <div style={{ position: "absolute", top: 6, right: 8, background: C.amber, color: "#fff", borderRadius: 10, padding: "1px 6px", fontSize: 9, fontWeight: 700 }}>AT LAB</div>
                 )}
-                {e.nurseResultsReady && e.stage==="doctor" && (
+                {e.stage === "nurse" && (
+                  <div style={{ position: "absolute", top: 6, right: 8, background: C.purple, color: "#fff", borderRadius: 10, padding: "1px 6px", fontSize: 9, fontWeight: 700 }}>AT NURSE</div>
+                )}
+                {hasLabResults && e.stage === "doctor" && (
                   <div style={{ position: "absolute", top: 6, right: 8, background: C.green, color: "#fff", borderRadius: 10, padding: "1px 6px", fontSize: 9, fontWeight: 700 }}>RESULTS READY</div>
                 )}
               </div>
             ))}
         </Card>
 
+        {/* Patient Records Search — look up any patient by name or ID */}
+        <PatientRecordsSearch patients={patients} pid={pid} selectPatient={selectPatient}/>
+
         {patient && (
-          <Card title="Patient">
+          <Card title="Patient Details">
             <div style={{ fontSize: 13, lineHeight: 1.9, color: C.textMid }}>
               <div style={{ fontWeight: 700, color: C.text }}>{patient.name}</div>
               <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11 }}>{patient.id}</div>
               <div>DOB: {patient.dob || "—"}</div>
               <div>Gender: {patient.gender || "—"}</div>
-              {patient.class && <div>Class: {patient.class}{patient.dorm && ` / ${patient.dorm}`}</div>}
+              {patient.class && <div>Class: {patient.class}</div>}
               {patient.employeeId && <div>EmpID: {patient.employeeId}</div>}
+              {patient.arrivalTime && <div>Arrived: {patient.arrivalTime}</div>}
               <div style={{ fontSize: 11, marginTop: 4 }}>📞 {patient.emergencyContact || "—"}</div>
             </div>
-            {/* Results ready indicators */}
-            {(hasNurseResults || hasLabResults) && (
-              <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 5 }}>
-                {hasNurseResults && (
-                  <div style={{ background: C.purpleLight, border: `1px solid ${C.purple}44`, borderRadius: 7, padding: "6px 10px", fontSize: 11, color: C.purple, fontWeight: 700, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    🩺 Vitals from nurse ready
-                    <Btn small color={C.purple} onClick={() => { setTab("nurse"); }}>View</Btn>
-                  </div>
-                )}
-                {hasLabResults && (
-                  <div style={{ background: C.amberLight, border: `1px solid ${C.amber}44`, borderRadius: 7, padding: "6px 10px", fontSize: 11, color: C.amber, fontWeight: 700, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    🔬 Lab results ready
-                    <Btn small color={C.amber} onClick={() => { setTab("lab"); }}>View</Btn>
-                  </div>
-                )}
+            {hasNurseResults && (
+              <div style={{ marginTop: 8, background: C.purpleLight, border: `1px solid ${C.purple}44`, borderRadius: 7, padding: "6px 10px", fontSize: 11, color: C.purple, fontWeight: 700, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                🩺 Vitals ready
+                <Btn small color={C.purple} onClick={() => setTab("nurse")}>View</Btn>
               </div>
             )}
+            {hasLabResults && (
+              <div style={{ marginTop: 6, background: C.amberLight, border: `1px solid ${C.amber}44`, borderRadius: 7, padding: "6px 10px", fontSize: 11, color: C.amber, fontWeight: 700, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                🔬 Lab results ready
+                <Btn small color={C.amber} onClick={() => setTab("lab")}>View</Btn>
+              </div>
+            )}
+            <div style={{ marginTop: 8 }}>
+              <Btn small outline color={C.accent} onClick={() => setTab("history")}>
+                📚 View Full History ({patient.visits?.length || 0} visits)
+              </Btn>
+            </div>
           </Card>
         )}
       </div>
@@ -392,23 +458,23 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
           ? <EmptyState icon="👨‍⚕️" message="Select a patient from your queue on the left" />
           : (
             <>
-              {/* Banner: patient is currently at lab/nurse but doctor can still see form */}
+              {/* Banner: patient is at lab */}
               {pid && !stillInQueue && (
                 <div style={{ background: C.amberLight, border: `1.5px solid ${C.amber}`, borderRadius: 9, padding: "10px 16px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div>
                     <div style={{ fontWeight: 700, color: C.amber, fontSize: 13 }}>
-                      ⏳ {patient?.name} is currently at {queue.find(e=>e.patientId===pid)?.stage || "another stage"}
+                      ⏳ {patient?.name} is currently at the laboratory
                     </div>
                     <div style={{ fontSize: 12, color: C.textMid, marginTop: 2 }}>
-                      Your form is preserved. Patient will return here once results are ready. Check the Nurse Results or Lab Results tabs.
+                      Your form is preserved. Patient returns here once results are uploaded.
                     </div>
                   </div>
-                  <Badge label="AWAITING RESULTS" color={C.amber}/>
+                  <Badge label="AWAITING LAB" color={C.amber}/>
                 </div>
               )}
 
               {/* Tab bar */}
-              <div style={{ display: "flex", gap: 4, marginBottom: 16, borderBottom: `2px solid ${C.border}`, paddingBottom: 0 }}>
+              <div style={{ display: "flex", gap: 4, marginBottom: 16, borderBottom: `2px solid ${C.border}` }}>
                 {tabDef.map(t => (
                   <button key={t.id} onClick={() => setTab(t.id)}
                     style={{ padding: "8px 16px", border: "none", borderBottom: `3px solid ${tab === t.id ? C.green : "transparent"}`, background: "transparent", cursor: "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: tab === t.id ? 700 : 500, color: tab === t.id ? C.green : C.textMid, marginBottom: -2, whiteSpace: "nowrap" }}>
@@ -420,48 +486,36 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
               {/* ══ TAB: Nurse Results ══ */}
               {tab === "nurse" && (
                 <Card title="Vitals from Nurse">
-                  {!hasNurseResults
-                    ? (
-                      <>
-                        <EmptyState icon="🩺" message="No vitals recorded yet for this patient" />
-                        <div style={{ marginTop: 16, display: "flex", gap: 10, alignItems: "center" }}>
-                          <span style={{ fontSize: 13, color: C.textMid }}>Send patient to nurse now:</span>
-                          <Btn color={C.purple} onClick={() => quickRoute("nurse")}>
-                            <ArrowRight size={13} /> Send to Nurse
-                          </Btn>
-                        </div>
-                      </>
-                    )
-                    : (
-                      <>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 16 }}>
-                          {[
-                            ["Blood Pressure", pendingVitals.bp],
-                            ["Temperature",    pendingVitals.temp],
-                            ["Weight",         pendingVitals.weight],
-                            ["Pulse",          pendingVitals.pulse],
-                            ["SpO₂",           pendingVitals.spo2],
-                            ["Complaint",      pendingVitals.complaint],
-                          ].map(([label, value]) => value ? (
-                            <div key={label} style={{ background: "#f8fafc", borderRadius: 8, padding: "10px 12px" }}>
-                              <div style={{ fontSize: 10, color: C.textLight, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3 }}>{label}</div>
-                              <div style={{ fontWeight: 700, fontSize: 15, color: C.text }}>{value}</div>
-                            </div>
-                          ) : null)}
-                        </div>
-                        {pendingVitals.recordedAt && (
-                          <div style={{ fontSize: 11, color: C.textLight, marginBottom: 14 }}>Recorded at {pendingVitals.recordedAt}</div>
-                        )}
-                        <div style={{ background: C.greenLight, border: `1.5px solid ${C.green}`, borderRadius: 9, padding: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <div style={{ fontSize: 13, color: C.green, fontWeight: 700 }}>
-                            ✓ Confirm to copy vitals into the Consultation form
+                  {!hasNurseResults ? (
+                    <EmptyState icon="🩺" message="No vitals recorded yet — patient has not been to the nurse" />
+                  ) : (
+                    <>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 16 }}>
+                        {[
+                          ["Blood Pressure", pendingVitals?.bp],
+                          ["Temperature",    pendingVitals?.temp],
+                          ["Weight",         pendingVitals?.weight],
+                          ["Pulse",          pendingVitals?.pulse],
+                          ["SpO₂",           pendingVitals?.spo2],
+                          ["Complaint",      pendingVitals?.complaint],
+                        ].filter(([,v]) => v).map(([label, value]) => (
+                          <div key={label} style={{ background: "#f8fafc", borderRadius: 8, padding: "10px 12px" }}>
+                            <div style={{ fontSize: 10, color: C.textLight, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3 }}>{label}</div>
+                            <div style={{ fontWeight: 700, fontSize: 15, color: C.text }}>{value}</div>
                           </div>
-                          <Btn color={C.green} onClick={confirmVitals}>
-                            <CheckCircle size={13} /> Use These Vitals
-                          </Btn>
-                        </div>
-                      </>
-                    )}
+                        ))}
+                      </div>
+                      {pendingVitals?.recordedAt && (
+                        <div style={{ fontSize: 11, color: C.textLight, marginBottom: 14 }}>Recorded at {pendingVitals.recordedAt}</div>
+                      )}
+                      <div style={{ background: C.greenLight, border: `1.5px solid ${C.green}`, borderRadius: 9, padding: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ fontSize: 13, color: C.green, fontWeight: 700 }}>✓ Confirm to copy vitals into the Consultation form</div>
+                        <Btn color={C.green} onClick={confirmVitals}>
+                          <CheckCircle size={13} /> Use These Vitals
+                        </Btn>
+                      </div>
+                    </>
+                  )}
                 </Card>
               )}
 
@@ -534,25 +588,6 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
                     </div>
                   )}
 
-                  {/* Quick route without writing report */}
-                  <Card title="Quick Route (without report)" style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 12, color: C.textMid, marginBottom: 10 }}>
-                      Send patient to get vitals or lab tests first — no diagnosis needed yet.
-                    </div>
-                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                      <Btn outline color={C.purple} onClick={() => quickRoute("nurse")}>
-                        🩺 Send to Nurse for Vitals
-                      </Btn>
-                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                        <input value={labTest} onChange={e => setLabTest(e.target.value)} placeholder="Lab test name…"
-                          style={{ border: `1.5px solid ${C.border}`, borderRadius: 7, padding: "7px 10px", fontSize: 12, fontFamily: "inherit", width: 180 }} />
-                        <Btn outline color={C.amber} onClick={() => labTest && quickRoute("lab", labTest)}>
-                          🔬 Send to Lab
-                        </Btn>
-                      </div>
-                    </div>
-                  </Card>
-
                   {/* Main clinical form */}
                   <Card title="Clinical Report">
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -583,8 +618,16 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
                       <Select label="Route Patient To ★" value={form.sendTo} onChange={v => set("sendTo", v)}
                         options={[
                           { value: "pharmacy", label: "💊 Pharmacy — Collect medication" },
+                          { value: "admit",    label: "🏥 Admit — Patient needs admission" },
                           { value: "done",     label: "✅ Discharged — No medication needed" },
                         ]} required />
+
+                      {/* Admit preview note */}
+                      {form.sendTo === "admit" && (
+                        <div style={{ gridColumn:"span 2", background:C.purpleLight, border:`1.5px solid ${C.purple}`, borderRadius:9, padding:"10px 14px", fontSize:13, color:C.purple, fontWeight:600 }}>
+                          🏥 After saving this report you will be taken to the Admission form to complete the admission.
+                        </div>
+                      )}
 
                       <div style={{ gridColumn: "span 2" }}>
                         <Textarea label="Prescriptions (one per line)" value={form.prescriptions} onChange={v => set("prescriptions", v)}
@@ -598,8 +641,8 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
                     </div>
 
                     <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
-                      <Btn color={C.green} onClick={saveVisit} disabled={saving}>
-                        <FileText size={13} /> {saving ? "Saving…" : "Save Report & Route Patient"}
+                      <Btn color={form.sendTo==="admit"?C.purple:C.green} onClick={saveVisit} disabled={saving}>
+                        <FileText size={13} /> {saving ? "Saving…" : form.sendTo==="admit"?"Save & Proceed to Admit":"Save Report & Route Patient"}
                       </Btn>
                       {form.diagnosis && (
                         <Btn outline color={C.accent} onClick={() => {
@@ -666,6 +709,7 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
           )}
       </div>
     </div>
+    </>
   );
 }
 
@@ -1011,6 +1055,204 @@ export function PharmacyView({ patients, queue, user, reload }) {
             </Card>
           );
         })}
+    </div>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
+// PATIENT RECORDS — doctor browses and prints any patient's complete file
+// ─────────────────────────────────────────────────────────────────────────────
+export function PatientRecords({ patients }) {
+  const [q, setQ] = useState("");
+  const [selected, setSelected] = useState(null); // full patient object
+  const [expandedVisit, setExpandedVisit] = useState(null);
+
+  const results = q.trim().length >= 1
+    ? patients.filter(p =>
+        p.name.toLowerCase().includes(q.toLowerCase()) ||
+        p.id.toLowerCase().includes(q.toLowerCase()) ||
+        (p.class||"").toLowerCase().includes(q.toLowerCase()) ||
+        (p.department||"").toLowerCase().includes(q.toLowerCase())
+      )
+    : patients.slice().reverse(); // show all patients newest first when no search
+
+  return (
+    <div style={{ padding: 24, display: "grid", gridTemplateColumns: "300px 1fr", gap: 18, alignItems: "start" }}>
+
+      {/* ── Left: search + patient list ── */}
+      <div>
+        <Card title={`Patient Records (${patients.length})`}>
+          <div style={{ position: "relative", marginBottom: 12 }}>
+            <span style={{ position:"absolute", left:9, top:"50%", transform:"translateY(-50%)", fontSize:13, color:C.textLight, pointerEvents:"none" }}>🔍</span>
+            <input
+              value={q}
+              onChange={e => setQ(e.target.value)}
+              placeholder="Search name, ID, class…"
+              style={{ width:"100%", padding:"8px 9px 8px 28px", border:`1.5px solid ${C.border}`, borderRadius:7, fontSize:13, fontFamily:"inherit", boxSizing:"border-box", background:"#f8fafc" }}
+              autoFocus
+            />
+            {q && <button onClick={() => setQ("")} style={{ position:"absolute", right:8, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color:C.textLight, fontSize:18 }}>×</button>}
+          </div>
+
+          <div style={{ maxHeight: 580, overflowY: "auto" }}>
+            {results.length === 0
+              ? <EmptyState icon="🔍" message="No patients found"/>
+              : results.map(p => (
+                <div key={p.id}
+                  onClick={() => { setSelected(p); setExpandedVisit(null); }}
+                  style={{ padding: "10px 8px", borderRadius: 8, cursor: "pointer", borderBottom: `1px solid ${C.border}`, background: selected?.id === p.id ? C.greenLight : "transparent", borderLeft: selected?.id === p.id ? `3px solid ${C.green}` : "3px solid transparent" }}>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: C.text }}>{p.name}</div>
+                  <div style={{ fontSize: 10, color: C.textMid, fontFamily: "'IBM Plex Mono',monospace" }}>{p.id} · {p.category}</div>
+                  <div style={{ fontSize: 11, color: C.textLight, marginTop: 2 }}>
+                    {p.visits?.length || 0} visit{p.visits?.length !== 1 ? "s" : ""}
+                    {p.arrivalTime ? ` · Arrived ${p.arrivalTime}` : ""}
+                    {p.registeredAt ? ` · Reg. ${p.registeredAt}` : ""}
+                  </div>
+                </div>
+              ))}
+          </div>
+          <div style={{ marginTop: 10, paddingTop: 8, borderTop: `1px solid ${C.border}`, fontSize: 11, color: C.textLight, textAlign: "center" }}>
+            {q ? `${results.length} of ${patients.length} patients` : `All ${patients.length} patients`}
+          </div>
+        </Card>
+      </div>
+
+      {/* ── Right: selected patient full record ── */}
+      <div>
+        {!selected
+          ? (
+            <div style={{ textAlign: "center", padding: "80px 20px", color: C.textLight }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>📁</div>
+              <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Patient Records Archive</div>
+              <div style={{ fontSize: 13 }}>Select a patient on the left to view their complete medical file</div>
+            </div>
+          )
+          : (
+            <>
+              {/* Patient header */}
+              <Card style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
+                      <div style={{ width: 44, height: 44, borderRadius: "50%", background: C.greenLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>
+                        {selected.gender === "F" ? "👩" : "👨"}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 800, fontSize: 18, color: C.text }}>{selected.name}</div>
+                        <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 12, color: C.textMid }}>{selected.id}</div>
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "4px 20px", fontSize: 12, color: C.textMid }}>
+                      {[
+                        ["Category",   selected.category],
+                        ["Gender",     selected.gender === "M" ? "Male" : selected.gender === "F" ? "Female" : selected.gender],
+                        ["DOB",        selected.dob || "—"],
+                        ["Phone",      selected.phone || "—"],
+                        ["Registered", selected.registeredAt],
+                        ["Emergency",  selected.emergencyContact || "—"],
+                        selected.class && ["Class", selected.class],
+                        selected.employeeId && ["Emp ID", selected.employeeId],
+                        selected.department && ["Dept", selected.department],
+                      ].filter(Boolean).map(([label, value]) => (
+                        <div key={label}><span style={{ color: C.textLight }}>{label}:</span> <b style={{ color: C.text }}>{value}</b></div>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <div style={{ textAlign: "center", background: C.greenLight, borderRadius: 10, padding: "10px 16px", minWidth: 64 }}>
+                      <div style={{ fontSize: 24, fontWeight: 800, color: C.green }}>{selected.visits?.length || 0}</div>
+                      <div style={{ fontSize: 10, color: C.textMid }}>Visits</div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Visit history */}
+              <Card title={`Full Visit History (${selected.visits?.length || 0} visits)`}>
+                {!selected.visits?.length
+                  ? <EmptyState icon="📋" message="No visits on record for this patient"/>
+                  : [...selected.visits].reverse().map((v, idx) => (
+                    <div key={v.id} style={{ border: `1px solid ${C.border}`, borderRadius: 10, marginBottom: 10, overflow: "hidden" }}>
+                      {/* Visit header — always visible */}
+                      <div
+                        onClick={() => setExpandedVisit(expandedVisit === v.id ? null : v.id)}
+                        style={{ padding: "12px 14px", background: expandedVisit === v.id ? C.accentGlow : "#f8fafc", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                          <div style={{ width: 28, height: 28, borderRadius: "50%", background: C.green + "22", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: C.green, flexShrink: 0 }}>
+                            {selected.visits.length - idx}
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 700, color: C.text }}>{v.diagnosis}</div>
+                            <div style={{ fontSize: 11, color: C.textMid }}>Dr. {v.doctor} · {v.treatment || "No treatment noted"}</div>
+                          </div>
+                        </div>
+                        <div style={{ display: "flex", gap: 10, alignItems: "center", flexShrink: 0 }}>
+                          <span style={{ fontSize: 11, color: C.textLight, fontFamily: "'IBM Plex Mono',monospace" }}>{v.date}</span>
+                          <Btn small outline color={C.accent} onClick={e => { e.stopPropagation(); printReport(selected, v); }}>
+                            <Printer size={11}/> Print
+                          </Btn>
+                          <span style={{ color: C.textLight, fontSize: 16 }}>{expandedVisit === v.id ? "▲" : "▼"}</span>
+                        </div>
+                      </div>
+
+                      {/* Visit body — expanded */}
+                      {expandedVisit === v.id && (
+                        <div style={{ padding: "14px 16px", borderTop: `1px solid ${C.border}` }}>
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                            {v.complaint && (
+                              <div style={{ gridColumn: "span 2" }}>
+                                <div style={{ fontSize: 10, color: C.textLight, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3 }}>Chief Complaint</div>
+                                <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{v.complaint}</div>
+                              </div>
+                            )}
+                            {/* Vitals */}
+                            {(v.vitalsNote || (v.vitals && Object.values(v.vitals).some(Boolean))) && (
+                              <div style={{ gridColumn: "span 2", background: C.greenLight, borderRadius: 8, padding: "10px 14px" }}>
+                                <div style={{ fontSize: 10, color: C.green, textTransform: "uppercase", fontWeight: 700, marginBottom: 6 }}>Vitals</div>
+                                <div style={{ fontSize: 13, color: C.textMid }}>
+                                  {v.vitalsNote || Object.entries(v.vitals||{}).filter(([,x])=>x).map(([k,x])=>`${k}: ${x}`).join("  ·  ")}
+                                </div>
+                              </div>
+                            )}
+                            {/* Lab results */}
+                            {v.labResults && (
+                              <div style={{ gridColumn: "span 2", background: C.amberLight, borderRadius: 8, padding: "10px 14px" }}>
+                                <div style={{ fontSize: 10, color: C.amber, textTransform: "uppercase", fontWeight: 700, marginBottom: 6 }}>Lab Results</div>
+                                <div style={{ fontSize: 13, color: C.textMid }}>{v.labResults}</div>
+                              </div>
+                            )}
+                            {/* Treatment */}
+                            {v.treatment && (
+                              <div>
+                                <div style={{ fontSize: 10, color: C.textLight, textTransform: "uppercase", marginBottom: 3 }}>Treatment</div>
+                                <div style={{ fontSize: 13, color: C.text }}>{v.treatment}</div>
+                              </div>
+                            )}
+                          </div>
+                          {/* Prescriptions */}
+                          {v.prescriptions?.length > 0 && (
+                            <div style={{ marginBottom: 10 }}>
+                              <div style={{ fontSize: 10, color: C.textLight, textTransform: "uppercase", marginBottom: 6 }}>Prescriptions</div>
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                {v.prescriptions.map((r, i) => (
+                                  <span key={i} style={{ background: "#f0f4ff", border: "1px solid #c7d2fe", borderRadius: 6, padding: "3px 10px", fontSize: 12 }}>💊 {r}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {/* Notes */}
+                          {v.notes && (
+                            <div style={{ background: "#f8fafc", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: C.textMid, fontStyle: "italic" }}>
+                              📝 {v.notes}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </Card>
+            </>
+          )}
+      </div>
     </div>
   );
 }

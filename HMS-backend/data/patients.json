@@ -430,7 +430,24 @@
   },
   {
     "pendingVitals": null,
-    "visits": [],
+    "visits": [
+      {
+        "id": "V1776837715835",
+        "date": "2026-04-22",
+        "doctor": "Dr. James Okello",
+        "complaint": "headache",
+        "vitalsNote": "",
+        "labNote": "",
+        "labResults": "",
+        "diagnosis": "headache",
+        "treatment": "",
+        "prescriptions": [],
+        "notes": "",
+        "vitals": {},
+        "labOrders": [],
+        "stage": "done"
+      }
+    ],
     "id": "HMS26-7356",
     "registeredAt": "2026-04-16",
     "name": "this is clean",
@@ -445,5 +462,24 @@
     "emergencyContact": "7664546757",
     "complaint": "headache",
     "specialist": "Doctor"
+  },
+  {
+    "pendingVitals": null,
+    "visits": [],
+    "id": "HMS26-7890",
+    "name": "tendo israel perez",
+    "firstName": "tendo",
+    "secondName": "israel",
+    "otherName": "perez",
+    "dob": "2002-09-25",
+    "gender": "M",
+    "phone": "",
+    "category": "NSVS (Secondary)",
+    "class": "s5",
+    "employeeId": "",
+    "department": "",
+    "emergencyContact": "077665544",
+    "arrivalTime": "02:33 PM",
+    "registeredAt": "2026-04-22"
   }
 ]

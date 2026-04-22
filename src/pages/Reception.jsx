@@ -7,9 +7,10 @@ import { api } from "../api";
 // ── Patient Registration ──────────────────────────────────────────────────────
 export function PatientRegistration({ patients, setPatients, reload }) {
   const blank = {
-    name:"", dob:"", gender:"", phone:"", category:"",
-    class:"", dorm:"", employeeId:"", department:"",
-    emergencyContact:"", complaint:"", specialist:""
+    firstName:"", secondName:"", otherName:"",
+    dob:"", gender:"", phone:"", category:"",
+    class:"", employeeId:"", department:"",
+    emergencyContact:"", specialist:"", arrivalTime:now()
   };
   const [form, setForm] = useState(blank);
   const [done, setDone] = useState(null);
@@ -21,33 +22,45 @@ export function PatientRegistration({ patients, setPatients, reload }) {
   const isSchool    = form.category==="NSVS (Secondary)" || form.category==="Samaritan (Primary)";
   const isSecondary = form.category==="NSVS (Secondary)";
 
+  // Full display name assembled from parts
+  const fullName = [form.firstName, form.secondName, form.otherName].filter(Boolean).join(" ");
+
   const handleSubmit = async () => {
-    if (!form.name||!form.category||!form.gender) { setErr("Name, gender and category are required."); return; }
-    if (form.complaint && !form.specialist) { setErr("Please assign a specialist (Doctor or Dentist) when a complaint is entered."); return; }
+    if (!form.firstName||!form.secondName||!form.category||!form.gender) {
+      setErr("First name, second name, gender and category are required."); return;
+    }
+    if (!form.specialist) { setErr("Please assign a specialist (Doctor or Dentist)."); return; }
     setSaving(true); setErr("");
     try {
       const id = genId("HMS");
       const patient = {
-        id, registeredAt:today(), visits:[], pendingVitals:null,
-        ...form,
+        id,
+        name: fullName,
+        firstName: form.firstName, secondName: form.secondName, otherName: form.otherName,
+        dob: form.dob, gender: form.gender,
         phone: isSchool ? "" : form.phone,
+        category: form.category,
+        class: form.class,
+        employeeId: form.employeeId, department: form.department,
+        emergencyContact: form.emergencyContact,
+        arrivalTime: form.arrivalTime || now(),
+        registeredAt: today(),
+        visits: [], pendingVitals: null,
       };
       await api.addPatient(patient);
 
-      // Route directly to the chosen specialist — no intermediate steps
-      if (form.complaint && form.specialist) {
-        const stage = form.specialist === "Dentist" ? "dentist" : "doctor";
-        await api.addToQueue({
-          patientId: id, name:form.name, stage,
-          priority:"normal", timestamp:now(),
-          complaint:form.complaint, assignedTo:"",
-          specialist: form.specialist,
-        });
-      }
+      // Route directly to chosen specialist
+      const stage = form.specialist === "Dentist" ? "dentist" : "doctor";
+      await api.addToQueue({
+        patientId: id, name: fullName, stage,
+        priority: "normal", timestamp: form.arrivalTime || now(),
+        complaint: "", assignedTo: "",
+        specialist: form.specialist,
+      });
 
       setPatients(prev => [...prev, patient]);
-      setDone({ id, name:form.name, specialist:form.specialist });
-      setForm(blank);
+      setDone({ id, name: fullName, specialist: form.specialist });
+      setForm({ ...blank, arrivalTime: now() });
       reload();
     } catch(e) { setErr(e.message); } finally { setSaving(false); }
   };
@@ -67,63 +80,61 @@ export function PatientRegistration({ patients, setPatients, reload }) {
       {/* ── Registration form ── */}
       <div>
         <SuccessBanner
-          msg={done && `✓ Registered — ${done.id} · ${done.name}${done.specialist ? ` → assigned to ${done.specialist}` : " (no queue entry)"}`}
+          msg={done && `✓ Registered — ${done.id} · ${done.name} → assigned to ${done.specialist}`}
           onDismiss={()=>setDone(null)}
         />
         <Card title="New Patient Registration">
           <ErrBanner err={err}/>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-            <Input label="Full Name" value={form.name} onChange={v=>set("name",v)} required placeholder="Patient full name"/>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12 }}>
+            <Input label="First Name ★" value={form.firstName} onChange={v=>set("firstName",v)} required placeholder="First name"/>
+            <Input label="Second Name ★" value={form.secondName} onChange={v=>set("secondName",v)} required placeholder="Second name"/>
+            <Input label="Other Name" value={form.otherName} onChange={v=>set("otherName",v)} placeholder="Middle / other name"/>
+          </div>
+
+          {fullName && (
+            <div style={{ margin:"10px 0 4px", padding:"6px 12px", background:"#f0fdf4", borderRadius:7, fontSize:12, color:C.green, fontWeight:600 }}>
+              Full name: {fullName}
+            </div>
+          )}
+
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginTop:12 }}>
             <Input label="Date of Birth" value={form.dob} onChange={v=>set("dob",v)} type="date"/>
-            <Select label="Gender" value={form.gender} onChange={v=>set("gender",v)} options={["M","F","Other"]} required/>
-            <Select label="Patient Category" value={form.category} onChange={v=>set("category",v)} options={CATEGORIES} required/>
+            <Select label="Gender ★" value={form.gender} onChange={v=>set("gender",v)} options={["M","F","Other"]} required/>
+            <Select label="Patient Category ★" value={form.category} onChange={v=>set("category",v)} options={CATEGORIES} required/>
 
             <div>
               <Input label="Phone Number" value={form.phone} onChange={v=>set("phone",v)}
                 placeholder={isSchool?"N/A — school patient":"07XXXXXXXX"} disabled={isSchool}/>
               {isSchool && <div style={{ fontSize:10, color:C.amber, marginTop:3 }}>📵 Not required for school patients</div>}
             </div>
-            <Input label="Emergency Contact" value={form.emergencyContact} onChange={v=>set("emergencyContact",v)} placeholder="Name: 07XXXXXXXX"/>
 
-            {isSecondary && <>
+            <Input label="Emergency Contact" value={form.emergencyContact} onChange={v=>set("emergencyContact",v)} placeholder="Name: 07XXXXXXXX"/>
+            <Input label="Arrival Time" value={form.arrivalTime} onChange={v=>set("arrivalTime",v)} type="time"/>
+
+            {isSecondary && (
               <Input label="Class / Form" value={form.class} onChange={v=>set("class",v)} placeholder="e.g. S3A"/>
-              <Input label="Dormitory / House" value={form.dorm} onChange={v=>set("dorm",v)} placeholder="e.g. Nile House"/>
-            </>}
-            {form.category==="Samaritan (Primary)" && <>
+            )}
+            {form.category==="Samaritan (Primary)" && (
               <Input label="Class" value={form.class} onChange={v=>set("class",v)} placeholder="e.g. P5"/>
-              <div/>
-            </>}
+            )}
             {form.category==="Staff" && <>
               <Input label="Employee ID" value={form.employeeId} onChange={v=>set("employeeId",v)} placeholder="EMP-XXXX"/>
               <Input label="Department" value={form.department} onChange={v=>set("department",v)} placeholder="e.g. Mathematics"/>
             </>}
 
-            {/* Complaint + specialist on same row */}
-            <div style={{ gridColumn:"span 2", display:"grid", gridTemplateColumns:"1fr 200px", gap:12 }}>
-              <Input
-                label="Chief Complaint"
-                value={form.complaint}
-                onChange={v=>set("complaint",v)}
-                placeholder="Reason for visit (required to add to queue)"
-              />
-              <Select
-                label="Assign to Specialist"
-                value={form.specialist}
-                onChange={v=>set("specialist",v)}
-                options={["Doctor","Dentist"]}
-                required={!!form.complaint}
-                disabled={!form.complaint}
-              />
+            <div style={{ gridColumn:"span 2" }}>
+              <Select label="Assign to Specialist ★" value={form.specialist} onChange={v=>set("specialist",v)} options={["Doctor","Dentist"]} required/>
+              {form.specialist && (
+                <div style={{ marginTop:6, padding:"7px 12px", background:form.specialist==="Dentist"?C.blueLight:C.greenLight, borderRadius:7, fontSize:12, color:form.specialist==="Dentist"?C.blue:C.green, fontWeight:600 }}>
+                  {form.specialist==="Dentist"?"🦷":"👨‍⚕️"} Patient will be placed directly in the {form.specialist}'s queue
+                </div>
+              )}
             </div>
-            {form.specialist && form.complaint && (
-              <div style={{ gridColumn:"span 2", background: form.specialist==="Dentist" ? C.blueLight : C.greenLight, borderRadius:8, padding:"8px 14px", fontSize:12, color: form.specialist==="Dentist" ? C.blue : C.green, fontWeight:600 }}>
-                {form.specialist==="Dentist" ? "🦷" : "👨‍⚕️"} Patient will be placed directly in the {form.specialist}'s queue
-              </div>
-            )}
           </div>
+
           <div style={{ marginTop:18, display:"flex", gap:10 }}>
             <Btn onClick={handleSubmit} disabled={saving}><UserPlus size={14}/> {saving?"Registering…":"Register Patient"}</Btn>
-            <Btn outline onClick={()=>{ setForm(blank); setErr(""); }}>Clear</Btn>
+            <Btn outline onClick={()=>{ setForm({ ...blank, arrivalTime:now() }); setErr(""); }}>Clear</Btn>
           </div>
         </Card>
       </div>
@@ -160,7 +171,9 @@ export function PatientRegistration({ patients, setPatients, reload }) {
                     <div style={{ fontWeight:600, fontSize:13, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.name}</div>
                     <div style={{ fontSize:10, color:C.textMid, fontFamily:"'IBM Plex Mono',monospace" }}>{p.id}</div>
                     <div style={{ fontSize:10, color:C.textLight }}>
-                      {p.registeredAt===today() ? <span style={{ color:C.green, fontWeight:600 }}>Today</span> : p.registeredAt}
+                      {p.registeredAt===today()
+                        ? <span style={{ color:C.green, fontWeight:600 }}>Today {p.arrivalTime ? `· Arrived ${p.arrivalTime}` : ""}</span>
+                        : p.registeredAt}
                       {p.class ? ` · ${p.class}` : ""}
                     </div>
                   </div>

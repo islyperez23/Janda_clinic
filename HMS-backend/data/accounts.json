@@ -78,5 +78,13 @@
     "password": "$2a$10$BwoPzo.8ueR68w6BIl933.UPMDpLQABSrE3IfoMpr8vNXvPShgaBa",
     "role": "receptionist",
     "active": false
+  },
+  {
+    "id": "USR1776837482227",
+    "name": "Israel Tendo",
+    "username": "In-charge",
+    "password": "$2a$10$oszAAYSjDhfGagUpGOrnQu43DMthDxMqVUI4FpIbiQytDxubDKTsW",
+    "role": "incharge",
+    "active": true
   }
 ]

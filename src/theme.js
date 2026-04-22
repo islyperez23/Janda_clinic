@@ -15,6 +15,7 @@ export const ROLES = {
   receptionist:{ label:"Receptionist",  color:C.accent,    icon:"🏥" },
   doctor:      { label:"Doctor",        color:C.green,     icon:"👨‍⚕️" },
   nurse:       { label:"Nurse",         color:C.purple,    icon:"👩‍⚕️" },
+  incharge:    { label:"In-Charge",     color:"#06b6d4",   icon:"🩺" },
   lab:         { label:"Laboratory",    color:C.amber,     icon:"🔬" },
   pharmacy:    { label:"Pharmacy",      color:C.pink,      icon:"💊" },
   dentist:     { label:"Dentist",       color:C.blue,      icon:"🦷" },
