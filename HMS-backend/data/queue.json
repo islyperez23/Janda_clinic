@@ -5,9 +5,10 @@
     "assignedTo": "",
     "patientId": "HMS26-9404",
     "name": "izzy teno",
-    "stage": "lab",
+    "stage": "pharmacy",
     "complaint": "headache",
-    "specialist": "Doctor"
+    "specialist": "Doctor",
+    "nurseResultsReady": true
   },
   {
     "priority": "normal",
@@ -15,8 +16,19 @@
     "assignedTo": "",
     "patientId": "HMS26-7890",
     "name": "tendo israel perez",
-    "stage": "lab",
+    "stage": "pharmacy",
     "complaint": "",
     "specialist": "Doctor"
+  },
+  {
+    "priority": "normal",
+    "timestamp": "10:25 AM",
+    "assignedTo": "",
+    "patientId": "HMS26-7484",
+    "name": "emma tyrone kizito",
+    "stage": "pharmacy",
+    "complaint": "",
+    "specialist": "Doctor",
+    "nurseResultsReady": true
   }
 ]

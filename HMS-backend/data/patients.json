@@ -318,7 +318,36 @@
   },
   {
     "pendingVitals": null,
-    "visits": [],
+    "visits": [
+      {
+        "id": "V1777016251775",
+        "date": "2026-04-24",
+        "doctor": "Dr. James Okello",
+        "complaint": "headache",
+        "vitalsNote": "BP: 120/80  |  Temp: 37  |  Weight: 70  |  Pulse: 74  |  SpO₂: 98",
+        "labNote": "teno: bloat",
+        "labResults": "teno: bloat",
+        "diagnosis": "rrrdnjjed ",
+        "treatment": "tablets",
+        "prescriptions": [
+          "eeeeeee"
+        ],
+        "notes": "",
+        "vitals": {
+          "bp": "120/80",
+          "temp": "37",
+          "weight": "70",
+          "pulse": "74",
+          "spo2": "98",
+          "complaint": "headache",
+          "recordedAt": "10:33 AM"
+        },
+        "labOrders": [
+          "LAB1776347792074"
+        ],
+        "stage": "pharmacy"
+      }
+    ],
     "id": "HMS26-9404",
     "registeredAt": "2026-04-16",
     "name": "izzy teno",
@@ -465,7 +494,26 @@
   },
   {
     "pendingVitals": null,
-    "visits": [],
+    "visits": [
+      {
+        "id": "V1776861005750",
+        "date": "2026-04-22",
+        "doctor": "Dr. James Okello",
+        "complaint": "head",
+        "vitalsNote": "130",
+        "labNote": "malaria",
+        "labResults": "malaria",
+        "diagnosis": "infection",
+        "treatment": "tablets",
+        "prescriptions": [
+          "paracetamol"
+        ],
+        "notes": "drink water",
+        "vitals": {},
+        "labOrders": [],
+        "stage": "pharmacy"
+      }
+    ],
     "id": "HMS26-7890",
     "name": "tendo israel perez",
     "firstName": "tendo",
@@ -481,5 +529,95 @@
     "emergencyContact": "077665544",
     "arrivalTime": "02:33 PM",
     "registeredAt": "2026-04-22"
+  },
+  {
+    "pendingVitals": null,
+    "visits": [
+      {
+        "id": "V1777032308088",
+        "date": "2026-04-24",
+        "doctor": "Dr. James Okello",
+        "complaint": "headache",
+        "vitalsNote": "BP: 120/80  |  Temp: 37  |  Weight: 70  |  Pulse: 74  |  SpO₂: 98",
+        "labNote": "Malaria RDT: mp++",
+        "labResults": "Malaria RDT: mp++",
+        "diagnosis": "infection",
+        "treatment": "tablets",
+        "prescriptions": [
+          "paracetamol",
+          "coartem"
+        ],
+        "notes": "full medication",
+        "vitals": {
+          "bp": "120/80",
+          "temp": "37",
+          "weight": "70",
+          "pulse": "74",
+          "spo2": "98",
+          "complaint": "headache",
+          "recordedAt": "10:34 AM"
+        },
+        "labOrders": [
+          "LAB1777032168216"
+        ],
+        "stage": "pharmacy"
+      }
+    ],
+    "id": "HMS26-7484",
+    "name": "emma tyrone kizito",
+    "firstName": "emma",
+    "secondName": "tyrone",
+    "otherName": "kizito",
+    "dob": "2005-02-07",
+    "gender": "M",
+    "phone": "",
+    "category": "NSVS (Secondary)",
+    "class": "s5",
+    "employeeId": "",
+    "department": "",
+    "emergencyContact": "33333",
+    "arrivalTime": "10:25 AM",
+    "registeredAt": "2026-04-24"
+  },
+  {
+    "pendingVitals": null,
+    "visits": [
+      {
+        "id": "V1777232722372",
+        "date": "2026-04-26",
+        "doctor": "Dr. James Okello",
+        "complaint": "headache",
+        "vitalsNote": "120/80",
+        "labNote": "Malaria RDT: m++",
+        "labResults": "Malaria RDT: m++",
+        "diagnosis": "malaria",
+        "treatment": "tablets",
+        "prescriptions": [
+          "coartem",
+          "paracetamol"
+        ],
+        "notes": "will be fine",
+        "vitals": {},
+        "labOrders": [
+          "LAB1777232437766"
+        ],
+        "stage": "pharmacy"
+      }
+    ],
+    "id": "HMS26-2580",
+    "name": "shrek the donkey",
+    "firstName": "shrek",
+    "secondName": "the",
+    "otherName": "donkey",
+    "dob": "2002-09-25",
+    "gender": "M",
+    "phone": "",
+    "category": "NSVS (Secondary)",
+    "class": "s5",
+    "employeeId": "",
+    "department": "",
+    "emergencyContact": "",
+    "arrivalTime": "10:37 PM",
+    "registeredAt": "2026-04-26"
   }
 ]

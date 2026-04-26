@@ -86,5 +86,13 @@
     "password": "$2a$10$oszAAYSjDhfGagUpGOrnQu43DMthDxMqVUI4FpIbiQytDxubDKTsW",
     "role": "incharge",
     "active": true
+  },
+  {
+    "id": "USR1777030891497",
+    "name": "ti",
+    "username": "ti",
+    "password": "$2a$10$L3McEsgMkcFXQQN.Qe.X8.53rHJX3UEi4scwZ4ybVXkp.ogocWK3O",
+    "role": "store",
+    "active": true
   }
 ]

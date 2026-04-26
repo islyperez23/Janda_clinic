@@ -173,5 +173,33 @@
     "category": "Procedure",
     "price": 10000,
     "active": true
+  },
+  {
+    "id": "SVC1777032020925",
+    "active": true,
+    "category": "Consultation",
+    "name": "hiv",
+    "price": 10000
+  },
+  {
+    "id": "SVC1777032049063",
+    "active": true,
+    "category": "Pharmacy",
+    "name": "paracetamol",
+    "price": 500
+  },
+  {
+    "id": "SVC1777032091711",
+    "active": true,
+    "category": "Consultation",
+    "name": "ammoxcillin",
+    "price": 2000
+  },
+  {
+    "id": "SVC1777032122696",
+    "active": true,
+    "category": "Consultation",
+    "name": "coartem",
+    "price": 500
   }
 ]

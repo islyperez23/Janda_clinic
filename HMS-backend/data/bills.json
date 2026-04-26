@@ -1,1 +1,52 @@
-[]
+[
+  {
+    "id": "BILL1777232400897",
+    "date": "2026-04-26",
+    "amountPaid": 42500,
+    "balance": 0,
+    "status": "paid",
+    "payments": [
+      {
+        "amount": 42500,
+        "method": "Cash",
+        "cashier": "Lydia Nassuna",
+        "timestamp": "10:58 PM",
+        "date": "2026-04-26"
+      }
+    ],
+    "createdBy": "Grace Nalwoga",
+    "patientId": "HMS26-2580",
+    "patientName": "shrek the donkey",
+    "services": [
+      {
+        "serviceId": "auto",
+        "name": "Doctor Consultation",
+        "price": 30000,
+        "qty": 1,
+        "subtotal": 30000,
+        "category": "Consultation"
+      },
+      {
+        "serviceId": "ITEM1777232437952",
+        "name": "Malaria RDT",
+        "price": 10000,
+        "qty": 1,
+        "subtotal": 10000,
+        "category": "Laboratory",
+        "addedBy": "Dr. James Okello",
+        "addedAt": "10:40 PM"
+      },
+      {
+        "serviceId": "ITEM1777233538788",
+        "name": "paracetamol",
+        "price": 500,
+        "qty": 5,
+        "subtotal": 2500,
+        "category": "Pharmacy",
+        "addedBy": "Lydia Nassuna",
+        "addedAt": "10:58 PM"
+      }
+    ],
+    "totalAmount": 42500
+  }
+]

@@ -68,6 +68,8 @@ export const api = {
   getDebtors:      ()       => get("/bills/debtors"),
   createBill:      (d)      => post("/bills", d),
   payBill:         (id,d)   => post(`/bills/${id}/pay`, d),
+  addBillItem:     (id,d)   => post(`/bills/${id}/add-item`, d),
+  getPatientBill:  (pid)    => get(`/bills/patient/${pid}`),
   // admissions
   getAdmissions:   ()       => get("/admissions"),
   admit:           (d)      => post("/admissions", d),

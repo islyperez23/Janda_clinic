@@ -245,7 +245,7 @@ function PatientRecordsSearch({ patients, pid, selectPatient }) {
 //   🔬 Lab Results    — lab results (confirm → auto-fill form)
 //   📚 Visit History  — all past visits
 // ─────────────────────────────────────────────────────────────────────────────
-export function PatientFile({ patients, queue, labOrders, user, reload }) {
+export function PatientFile({ patients, queue, labOrders, services, user, reload }) {
   const [pid, setPid] = useState("");
   const [tab, setTab] = useState("consultation");
   const [form, setForm] = useState({
@@ -253,8 +253,16 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
     diagnosis: "", treatment: "", prescriptions: "", notes: "", sendTo: ""
   });
   const [labTest, setLabTest] = useState("");
+  const [labSearch, setLabSearch] = useState("");
   const [saving, setSaving] = useState(false);
   const [showAdmitForm, setShowAdmitForm] = useState(false);
+
+  // Lab services filtered from the system service catalogue (passed as prop)
+  const activeServices = (services || []).filter(s => s.active);
+  const labServices = activeServices.filter(s => s.category === "Laboratory");
+  const labFiltered = labSearch.trim()
+    ? labServices.filter(s => s.name.toLowerCase().includes(labSearch.toLowerCase()))
+    : labServices;
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const myQueue = queue.filter(e => e.stage === "doctor");
@@ -312,18 +320,27 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
   };
 
   // ── Quick route (no report) — send to nurse or lab ──────────────────────
-  const quickRoute = async (stage, testName = "") => {
+  const quickRoute = async (stage, testName = "", testPrice = 0) => {
     const inQueue = queue.find(e => e.patientId === pid);
     if (!inQueue) { alert("Patient is not in the active queue."); return; }
     try {
       if (stage === "lab" && testName) {
         await api.addLabOrder({
           id: genLab(), patientId: pid, patientName: patient?.name || "",
-          test: testName, requestedBy: user.name, status: "pending", timestamp: now(), result: ""
+          test: testName, price: testPrice, requestedBy: user.name,
+          status: "pending", timestamp: now(), result: ""
         });
+
+        // Auto-add lab test cost to patient's running bill
+        try {
+          const bill = await api.getPatientBill(pid);
+          if (bill) {
+            await api.addBillItem(bill.id, { name: testName, price: testPrice, qty: 1, category: "Laboratory" });
+          }
+        } catch(e) { console.warn("Could not add lab cost to bill:", e); }
       }
       await api.updateQueue(pid, { stage });
-      setLabTest("");
+      setLabTest(""); setLabSearch("");
       reload();
     } catch(e) { alert(e.message); }
   };
@@ -485,19 +502,25 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
 
               {/* ══ TAB: Nurse Results ══ */}
               {tab === "nurse" && (
-                <Card title="Vitals from Nurse">
+                <Card title="🩺 Nurse — Vitals">
                   {!hasNurseResults ? (
-                    <EmptyState icon="🩺" message="No vitals recorded yet — patient has not been to the nurse" />
+                    <div style={{ textAlign: "center", padding: "30px 20px" }}>
+                      <div style={{ fontSize: 40, marginBottom: 12 }}>🩺</div>
+                      <div style={{ fontSize: 14, color: C.textMid, marginBottom: 20 }}>Patient has not been to the nurse yet</div>
+                      <Btn color={C.purple} onClick={() => quickRoute("nurse")} style={{ margin: "0 auto", fontSize: 14, padding: "12px 32px" }}>
+                        <ArrowRight size={15} /> Send to Nurse for Vitals
+                      </Btn>
+                    </div>
                   ) : (
                     <>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 16 }}>
                         {[
-                          ["Blood Pressure", pendingVitals?.bp],
-                          ["Temperature",    pendingVitals?.temp],
-                          ["Weight",         pendingVitals?.weight],
-                          ["Pulse",          pendingVitals?.pulse],
-                          ["SpO₂",           pendingVitals?.spo2],
-                          ["Complaint",      pendingVitals?.complaint],
+                          ["❤️ Blood Pressure", pendingVitals?.bp],
+                          ["🌡 Temperature",    pendingVitals?.temp],
+                          ["⚖️ Weight",         pendingVitals?.weight],
+                          ["💓 Pulse",          pendingVitals?.pulse],
+                          ["🫁 SpO₂",           pendingVitals?.spo2],
+                          ["📋 Complaint",      pendingVitals?.complaint],
                         ].filter(([,v]) => v).map(([label, value]) => (
                           <div key={label} style={{ background: "#f8fafc", borderRadius: 8, padding: "10px 12px" }}>
                             <div style={{ fontSize: 10, color: C.textLight, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3 }}>{label}</div>
@@ -509,7 +532,7 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
                         <div style={{ fontSize: 11, color: C.textLight, marginBottom: 14 }}>Recorded at {pendingVitals.recordedAt}</div>
                       )}
                       <div style={{ background: C.greenLight, border: `1.5px solid ${C.green}`, borderRadius: 9, padding: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div style={{ fontSize: 13, color: C.green, fontWeight: 700 }}>✓ Confirm to copy vitals into the Consultation form</div>
+                        <div style={{ fontSize: 13, color: C.green, fontWeight: 700 }}>✓ Copy vitals into the Consultation form</div>
                         <Btn color={C.green} onClick={confirmVitals}>
                           <CheckCircle size={13} /> Use These Vitals
                         </Btn>
@@ -521,15 +544,58 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
 
               {/* ══ TAB: Lab Results ══ */}
               {tab === "lab" && (
-                <Card title="Lab Results">
-                  {/* Order a test */}
-                  <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 16, padding: "12px 14px", background: "#f8fafc", borderRadius: 8 }}>
-                    <input value={labTest} onChange={e => setLabTest(e.target.value)}
-                      placeholder="Test name (e.g. Malaria RDT, Full Blood Count)…"
-                      style={{ flex: 1, border: `1.5px solid ${C.border}`, borderRadius: 7, padding: "7px 10px", fontSize: 13, fontFamily: "inherit" }} />
-                    <Btn color={C.amber} onClick={() => labTest && quickRoute("lab", labTest)}>
-                      <TestTube2 size={13} /> Order Test
-                    </Btn>
+                <Card title="🔬 Lab Results">
+                  {/* Order a test — searchable dropdown */}
+                  <div style={{ marginBottom: 16, padding: "14px 16px", background: C.amberLight, borderRadius: 10, border: `1px solid ${C.amber}33` }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: C.amber, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.05em" }}>Order a Lab Test</div>
+                    <div style={{ position: "relative" }}>
+                      <div style={{ position: "relative" }}>
+                        <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: C.textLight, pointerEvents: "none" }}>🔍</span>
+                        <input
+                          value={labSearch}
+                          onChange={e => { setLabSearch(e.target.value); setLabTest(""); }}
+                          placeholder="Type to search lab tests (e.g. malaria, blood count)…"
+                          style={{ width: "100%", padding: "10px 12px 10px 32px", border: `1.5px solid ${C.amber}`, borderRadius: 8, fontSize: 14, fontFamily: "inherit", boxSizing: "border-box", background: "#fff" }}
+                          onFocus={() => { if (!labSearch) setLabSearch(" "); setTimeout(() => setLabSearch(""), 0); }}
+                        />
+                      </div>
+
+                      {/* Dropdown results */}
+                      {labSearch.trim() && !labTest && (
+                        <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 20, background: "#fff", border: `1.5px solid ${C.border}`, borderRadius: 8, marginTop: 4, maxHeight: 250, overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>
+                          {labFiltered.length === 0 ? (
+                            <div style={{ padding: 16, fontSize: 13, color: C.textLight, textAlign: "center" }}>No lab tests matching "{labSearch}"</div>
+                          ) : labFiltered.map(svc => (
+                            <div key={svc.id}
+                              onClick={() => { setLabTest(svc.name); setLabSearch(svc.name); }}
+                              style={{ padding: "11px 16px", cursor: "pointer", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                              onMouseEnter={e => e.currentTarget.style.background = C.amberLight}
+                              onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                              <div>
+                                <div style={{ fontWeight: 600, fontSize: 14, color: C.text }}>🔬 {svc.name}</div>
+                              </div>
+                              <div style={{ fontWeight: 700, color: C.green, fontSize: 14 }}>UGX {svc.price.toLocaleString()}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Selected test + send button */}
+                    {labTest && (
+                      <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fff", border: `1.5px solid ${C.amber}`, borderRadius: 9, padding: "12px 16px" }}>
+                        <div>
+                          <span style={{ fontWeight: 700, color: C.text, fontSize: 14 }}>🔬 {labTest}</span>
+                          <span style={{ fontSize: 13, color: C.green, fontWeight: 700, marginLeft: 14 }}>UGX {(labServices.find(s=>s.name===labTest)?.price||0).toLocaleString()}</span>
+                        </div>
+                        <Btn color={C.amber} onClick={() => {
+                          const svc = labServices.find(s => s.name === labTest);
+                          quickRoute("lab", labTest, svc?.price || 0);
+                        }} style={{ fontSize: 14, padding: "10px 24px" }}>
+                          <TestTube2 size={14} /> Send to Lab
+                        </Btn>
+                      </div>
+                    )}
                   </div>
 
                   {/* Pending orders */}
@@ -538,7 +604,10 @@ export function PatientFile({ patients, queue, labOrders, user, reload }) {
                       <div style={{ fontSize: 12, fontWeight: 700, color: C.amber, marginBottom: 8 }}>⏳ Pending</div>
                       {myLabPending.map(o => (
                         <div key={o.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: C.amberLight, borderRadius: 7, marginBottom: 6 }}>
-                          <div style={{ fontWeight: 600 }}>{o.test}</div>
+                          <div>
+                            <div style={{ fontWeight: 600 }}>{o.test}</div>
+                            {o.price > 0 && <div style={{ fontSize: 11, color: C.green }}>UGX {o.price.toLocaleString()}</div>}
+                          </div>
                           <Badge label="Awaiting Results" color={C.amber} />
                         </div>
                       ))}
@@ -938,123 +1007,411 @@ export function LabView({ labOrders, queue, reload }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PHARMACY VIEW  — dispense meds + collect payment → creates transaction → done
+// PHARMACY VIEW  — searchable drug dropdown, accumulated bill, payment
 // ─────────────────────────────────────────────────────────────────────────────
-export function PharmacyView({ patients, queue, user, reload }) {
+export function PharmacyView({ patients, queue, services, bills, setBills, user, reload }) {
   const pharmQueue = queue.filter(e => e.stage === "pharmacy");
-  const [active, setActive] = useState(null); // { patientId, amount, method, note }
-  const [saving, setSaving] = useState(false);
-  const genTxn = () => `TXN-${today().replace(/-/g,"")}-${Math.floor(100+Math.random()*900)}`;
-  const today = () => new Date().toISOString().slice(0,10);
+  const [activePid, setActivePid] = useState(null);
+  const [drugSearch, setDrugSearch] = useState("");
+  const [addedDrugs, setAddedDrugs] = useState([]); // [{name, price, qty}]
+  const [payAmt, setPayAmt]   = useState("");
+  const [payMethod, setPayMethod] = useState("Cash");
+  const [saving, setSaving]   = useState(false);
+  const [customDrug, setCustomDrug] = useState({ name:"", price:"" });
+
+  // Drug catalogue from services
+  const allDrugs = (services||[]).filter(s => s.active && s.category === "Pharmacy");
+  const drugFiltered = drugSearch.trim()
+    ? allDrugs.filter(d => d.name.toLowerCase().includes(drugSearch.toLowerCase()))
+    : allDrugs;
+
+  // Get the FRESH bill from server when selecting a patient (not stale local state)
+  const [liveBill, setLiveBill] = useState(null);
+  const [loadingBill, setLoadingBill] = useState(false);
+
+  const selectPatient = async (pid) => {
+    setActivePid(pid);
+    setAddedDrugs([]);
+    setDrugSearch("");
+    setPayAmt("");
+    setPayMethod("Cash");
+    setLiveBill(null);
+    setLoadingBill(true);
+    try {
+      const bill = await api.getPatientBill(pid);
+      setLiveBill(bill);
+    } catch(e) { console.warn("Could not fetch bill:", e); }
+    finally { setLoadingBill(false); }
+  };
+
+  const addDrug = (drug) => {
+    const exists = addedDrugs.find(d => d.name === drug.name);
+    if (exists) setAddedDrugs(prev => prev.map(d => d.name === drug.name ? { ...d, qty: d.qty + 1 } : d));
+    else setAddedDrugs(prev => [...prev, { name: drug.name, price: drug.price, qty: 1 }]);
+    setDrugSearch("");
+  };
+
+  const addCustomDrug = () => {
+    if (!customDrug.name || !customDrug.price) return;
+    addDrug({ name: customDrug.name, price: parseInt(customDrug.price) });
+    setCustomDrug({ name:"", price:"" });
+  };
+
+  const removeDrug = (name) => setAddedDrugs(prev => prev.filter(d => d.name !== name));
+  const updateDrugQty = (name, qty) => setAddedDrugs(prev => prev.map(d => d.name === name ? { ...d, qty: Math.max(1, qty) } : d));
+  const drugsTotal = addedDrugs.reduce((s, d) => s + d.price * d.qty, 0);
+
+  // ── Print full receipt with ALL charges ──────────────────────────────────
+  const printReceipt = (bill, patientName) => {
+    const win = window.open("","_blank","width=440,height=750");
+    const items = (bill.services||[]).map(s =>
+      `<tr><td style="padding:3px 0">${s.name}</td><td style="text-align:right;padding:3px 0">×${s.qty}</td><td style="text-align:right;padding:3px 0;font-weight:bold">UGX ${s.subtotal.toLocaleString()}</td></tr>`
+    ).join("");
+    const payments = (bill.payments||[]).map(p =>
+      `<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0"><span>${p.date} · ${p.method}</span><span>UGX ${p.amount.toLocaleString()}</span></div>`
+    ).join("");
+    win.document.write(`<!DOCTYPE html><html><head><title>Receipt</title>
+    <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Courier New',monospace;padding:20px;font-size:13px;max-width:380px;margin:0 auto}
+    .center{text-align:center}.div{border-top:1px dashed #333;margin:10px 0}
+    table{width:100%;border-collapse:collapse}
+    .total{font-size:18px;font-weight:bold}.green{color:#16a34a}.red{color:#dc2626}
+    button{display:block;margin:16px auto;padding:8px 24px;background:#0e7490;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px}
+    @media print{button{display:none}}</style></head><body>
+    <div class="center">
+      <div style="font-size:28px">🏥</div>
+      <div style="font-size:18px;font-weight:bold">HMS CLINIC</div>
+      <div style="font-size:11px;color:#666;letter-spacing:0.1em">PATIENT RECEIPT</div>
+    </div>
+    <div class="div"></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px">
+      <span>Receipt: <b>${bill.id}</b></span><span>${bill.date}</span>
+    </div>
+    <div style="margin:4px 0;font-weight:bold;font-size:14px">${patientName}</div>
+    <div class="div"></div>
+    <table>
+      <thead><tr style="border-bottom:1px solid #333">
+        <th style="text-align:left;font-size:11px;padding-bottom:4px">SERVICE</th>
+        <th style="text-align:right;font-size:11px;padding-bottom:4px">QTY</th>
+        <th style="text-align:right;font-size:11px;padding-bottom:4px">AMOUNT</th>
+      </tr></thead>
+      <tbody>${items}</tbody>
+    </table>
+    <div class="div"></div>
+    <div style="display:flex;justify-content:space-between" class="total">
+      <span>TOTAL</span><span>UGX ${bill.totalAmount.toLocaleString()}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:14px" class="green">
+      <span>PAID</span><span>UGX ${bill.amountPaid.toLocaleString()}</span>
+    </div>
+    ${bill.balance > 0 ? `<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:bold" class="red"><span>BALANCE DUE</span><span>UGX ${bill.balance.toLocaleString()}</span></div>` : ""}
+    <div class="div"></div>
+    <div style="font-weight:bold;font-size:11px;margin-bottom:4px">PAYMENT HISTORY</div>
+    ${payments || '<div style="font-size:11px;color:#666">No payments recorded</div>'}
+    <div class="div"></div>
+    <div class="center" style="font-size:11px;color:#666">
+      ${bill.balance > 0 ? "Please clear your balance at your next visit" : "✓ FULLY PAID — Thank you!"}
+    </div>
+    <div class="center" style="font-size:10px;color:#999;margin-top:8px">Printed: ${new Date().toLocaleString()}</div>
+    <button onclick="window.print()">🖨 Print Receipt</button>
+    </body></html>`);
+    win.document.close();
+  };
+
+  const dispenseAndCollect = async (entry) => {
+    setSaving(true);
+    try {
+      let bill = liveBill;
+
+      // If no bill exists, create one now
+      if (!bill) {
+        bill = await api.createBill({
+          patientId: entry.patientId,
+          patientName: patients.find(x=>x.id===entry.patientId)?.name || entry.name,
+          services: [],
+          totalAmount: 0,
+        });
+      }
+
+      // Add each drug to the bill
+      if (addedDrugs.length > 0) {
+        for (const drug of addedDrugs) {
+          await api.addBillItem(bill.id, { name: drug.name, price: drug.price, qty: drug.qty, category: "Pharmacy" });
+        }
+      }
+
+      // Refetch the complete updated bill (now has consultation + lab + drugs)
+      const finalBill = await api.getPatientBill(entry.patientId) || bill;
+      const grandTotal = finalBill.totalAmount;
+      const payAmount = parseInt(payAmt) || grandTotal;
+
+      // Collect payment (full or partial)
+      let paidBill = finalBill;
+      if (payAmount > 0) {
+        paidBill = await api.payBill(finalBill.id, { amount: payAmount, method: payMethod, cashier: user?.name || "" });
+        setBills(prev => {
+          const exists = prev.find(b => b.id === paidBill.id);
+          return exists ? prev.map(b => b.id === paidBill.id ? paidBill : b) : [...prev, paidBill];
+        });
+      }
+
+      // Also create a transaction record (with ALL services from the bill)
+      const patientName = patients.find(x=>x.id===entry.patientId)?.name || entry.name;
+      await api.addTransaction({
+        id: `TXN-${new Date().toISOString().slice(0,10).replace(/-/g,"")}-${Math.floor(100+Math.random()*900)}`,
+        patientId: entry.patientId,
+        patientName,
+        services: (paidBill.services||[]).map(s => `${s.name} x${s.qty}`),
+        amount: payAmount,
+        method: payMethod,
+        cashier: user?.name || "",
+        timestamp: now(),
+        date: today(),
+      });
+
+      // Close the visit
+      await api.updateQueue(entry.patientId, { stage: "done" });
+
+      // Print receipt
+      printReceipt(paidBill, patientName);
+
+      setActivePid(null);
+      setAddedDrugs([]);
+      setLiveBill(null);
+      setPayAmt("");
+      reload();
+    } catch(e) { alert(e.message); } finally { setSaving(false); }
+  };
 
   const getLastVisit = (pid) => {
     const p = patients.find(x => x.id === pid);
     return p?.visits?.slice(-1)[0] || null;
   };
 
-  const dispenseAndCollect = async (entry) => {
-    if (!active?.amount || parseInt(active.amount) <= 0) { alert("Enter the payment amount."); return; }
-    setSaving(true);
-    try {
-      const p = patients.find(x => x.id === entry.patientId);
-      // Record the transaction
-      const txn = {
-        id: genTxn(),
-        patientId:   entry.patientId,
-        patientName: p?.name || entry.name,
-        services:    active.note ? active.note.split(",").map(s=>s.trim()) : ["Pharmacy — Drugs dispensed"],
-        amount:      parseInt(active.amount),
-        method:      active.method || "Cash",
-        cashier:     user.name,
-        timestamp:   new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}),
-        date:        today(),
-      };
-      await api.addTransaction(txn);
-      // Close the visit
-      await api.updateQueue(entry.patientId, { stage: "done" });
-      setActive(null);
-      reload();
-      alert(`✓ Payment recorded — UGX ${parseInt(active.amount).toLocaleString()}\nReceipt ID: ${txn.id}`);
-    } catch(e) { alert(e.message); } finally { setSaving(false); }
-  };
-
   return (
-    <div style={{ padding: 24 }}>
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ background: `linear-gradient(135deg,${C.pink},${C.pink}88)`, borderRadius: 12, padding: "18px 24px", color: "#fff", display: "inline-flex", alignItems: "center", gap: 16 }}>
-          <div style={{ fontSize: 32 }}>💊</div>
-          <div>
-            <div style={{ fontSize: 11, opacity: 0.8 }}>AWAITING PHARMACY</div>
-            <div style={{ fontSize: 30, fontWeight: 800 }}>{pharmQueue.length}</div>
-            <div style={{ fontSize: 11, opacity: 0.7 }}>Dispense meds + collect payment → visit closes automatically</div>
-          </div>
+    <div style={{ padding: 24, display: "grid", gridTemplateColumns: "280px 1fr", gap: 18 }}>
+
+      {/* Left: pharmacy queue */}
+      <div>
+        <div style={{ background: `linear-gradient(135deg,${C.pink},${C.pink}88)`, borderRadius: 12, padding: "16px 20px", color: "#fff", marginBottom: 14 }}>
+          <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 2 }}>AWAITING PHARMACY</div>
+          <div style={{ fontSize: 28, fontWeight: 800 }}>{pharmQueue.length}</div>
         </div>
+        <Card>
+          {pharmQueue.length === 0
+            ? <EmptyState icon="💊" message="No prescriptions pending" />
+            : pharmQueue.map(entry => {
+              const localBill = (bills||[]).find(b => b.patientId === entry.patientId && b.status !== "paid");
+              const billTotal = localBill?.totalAmount || 0;
+              return (
+                <div key={entry.patientId} onClick={() => selectPatient(entry.patientId)}
+                  style={{ padding: "10px", borderRadius: 8, border: `1.5px solid ${activePid === entry.patientId ? C.pink : C.border}`, cursor: "pointer", marginBottom: 8, background: activePid === entry.patientId ? "#fdf2ff" : "transparent" }}>
+                  <div style={{ fontWeight: 700, fontSize: 13 }}>{entry.name}</div>
+                  <div style={{ fontSize: 10, color: C.textMid, fontFamily: "'IBM Plex Mono',monospace" }}>{entry.patientId}</div>
+                  {billTotal > 0 && (
+                    <div style={{ fontSize: 11, color: C.green, fontWeight: 700, marginTop: 3 }}>
+                      Running bill: UGX {billTotal.toLocaleString()}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+        </Card>
       </div>
 
-      {pharmQueue.length === 0
-        ? <Card><EmptyState icon="💊" message="No prescriptions pending" /></Card>
-        : pharmQueue.map(entry => {
-          const lastVisit = getLastVisit(entry.patientId);
-          const rx = lastVisit?.prescriptions || [];
-          const isActive = active?.patientId === entry.patientId;
+      {/* Right: drug dispensing + bill */}
+      <div>
+        {!activePid ? (
+          <div style={{ textAlign: "center", padding: "80px 20px", color: C.textLight }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>💊</div>
+            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Select a patient from the pharmacy queue</div>
+            <div style={{ fontSize: 13 }}>Dispense medication, add to bill, and collect payment</div>
+          </div>
+        ) : (() => {
+          const entry = pharmQueue.find(e => e.patientId === activePid);
+          if (!entry) return <EmptyState icon="💊" message="Patient not found in queue" />;
+          if (loadingBill) return <div style={{ padding: 40, textAlign: "center", color: C.textLight }}>Loading patient bill…</div>;
+          const bill = liveBill; // fresh from server, not stale local state
+          const lastVisit = getLastVisit(activePid);
+          const existingItems = bill?.services || [];
+          const existingTotal = existingItems.reduce((s, i) => s + (i.subtotal||0), 0);
+          const grandTotal = existingTotal + drugsTotal;
+          const alreadyPaid = bill?.amountPaid || 0;
+          const balanceDue = grandTotal - alreadyPaid;
 
           return (
-            <Card key={entry.patientId} style={{ marginBottom: 12, border: isActive ? `2px solid ${C.pink}` : undefined }}>
-              {/* Patient header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 16 }}>{entry.name}</div>
-                  <div style={{ fontSize: 11, color: C.textMid, fontFamily: "'IBM Plex Mono',monospace" }}>{entry.patientId} · {entry.timestamp}</div>
-                  {lastVisit && <div style={{ fontSize: 12, color: C.textMid, marginTop: 3 }}>Diagnosis: <b>{lastVisit.diagnosis}</b> · Dr. {lastVisit.doctor}</div>}
+            <>
+              {/* Patient + prescription header */}
+              <Card style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: 18 }}>{entry.name}</div>
+                    <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 12, color: C.textMid }}>{entry.patientId}</div>
+                    {lastVisit && <div style={{ fontSize: 12, color: C.textMid, marginTop: 4 }}>Diagnosis: <b>{lastVisit.diagnosis}</b> · Dr. {lastVisit.doctor}</div>}
+                  </div>
+                  <Badge label="AT PHARMACY" color={C.pink} />
                 </div>
-                {!isActive && (
-                  <Btn color={C.pink} onClick={() => setActive({ patientId:entry.patientId, amount:"", method:"Cash", note:"" })}>
-                    <CheckCircle size={13} /> Dispense & Collect Payment
-                  </Btn>
+                {lastVisit?.prescriptions?.length > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: C.textMid, textTransform: "uppercase", marginBottom: 6 }}>Doctor's Prescriptions</div>
+                    {lastVisit.prescriptions.map((r, i) => (
+                      <div key={i} style={{ padding: "8px 14px", background: "#fdf2ff", border: "1px solid #f0abfc", borderRadius: 7, marginBottom: 5, fontSize: 13 }}>💊 {r}</div>
+                    ))}
+                  </div>
                 )}
-              </div>
+              </Card>
 
-              {/* Prescriptions */}
-              {rx.length > 0 && (
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: C.textMid, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Prescriptions</div>
-                  {rx.map((r, i) => (
-                    <div key={i} style={{ padding: "8px 14px", background: "#fdf2ff", border: "1px solid #f0abfc", borderRadius: 7, marginBottom: 5, fontSize: 13 }}>
-                      💊 {r}
-                    </div>
-                  ))}
+              {/* Running bill — items already accumulated */}
+              <Card title="📋 Running Bill (auto-accumulated)" style={{ marginBottom: 14 }}>
+                {existingItems.length === 0
+                  ? <div style={{ fontSize: 12, color: C.textLight, padding: 8 }}>No charges recorded yet</div>
+                  : (
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginBottom: 8 }}>
+                      <thead><tr style={{ borderBottom: `2px solid ${C.border}` }}>
+                        {["Service", "Category", "Qty", "Amount"].map(h => <th key={h} style={{ textAlign: "left", padding: "5px 8px", fontSize: 10, color: C.textLight, fontWeight: 700, textTransform: "uppercase" }}>{h}</th>)}
+                      </tr></thead>
+                      <tbody>
+                        {existingItems.map((item, i) => (
+                          <tr key={i} style={{ borderBottom: `1px solid ${C.border}` }}>
+                            <td style={{ padding: "7px 8px", fontWeight: 600 }}>{item.name}</td>
+                            <td style={{ padding: "7px 8px" }}><Badge label={item.category||"Other"} color={item.category==="Consultation"?C.green:item.category==="Laboratory"?C.amber:C.accent} /></td>
+                            <td style={{ padding: "7px 8px" }}>×{item.qty}</td>
+                            <td style={{ padding: "7px 8px", fontWeight: 700, color: C.green }}>UGX {item.subtotal.toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                <div style={{ textAlign: "right", fontWeight: 700, color: C.textMid, fontSize: 13 }}>
+                  Subtotal: UGX {existingTotal.toLocaleString()}
                 </div>
-              )}
+              </Card>
 
-              {/* Payment collection form */}
-              {isActive && (
-                <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: C.textMid, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>
-                    💳 Collect Payment
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-                    <Input label="Amount (UGX) ★" value={active.amount}
-                      onChange={v => setActive(a => ({ ...a, amount: v }))} type="number" placeholder="e.g. 45000" />
-                    <Select label="Payment Method" value={active.method}
-                      onChange={v => setActive(a => ({ ...a, method: v }))}
-                      options={["Cash","Mobile Money","Insurance","Waiver"]} />
-                    <div style={{ gridColumn: "span 2" }}>
-                      <Input label="Services / Items (comma-separated)" value={active.note}
-                        onChange={v => setActive(a => ({ ...a, note: v }))}
-                        placeholder="e.g. Consultation, Amoxicillin 500mg, Paracetamol" />
+              {/* Drug selection — searchable dropdown */}
+              <Card title="💊 Add Dispensed Drugs" style={{ marginBottom: 14 }}>
+                <div style={{ position: "relative", marginBottom: 12 }}>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <div style={{ flex: 1, position: "relative" }}>
+                      <span style={{ position: "absolute", left: 9, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: C.textLight, pointerEvents: "none" }}>🔍</span>
+                      <input
+                        value={drugSearch}
+                        onChange={e => setDrugSearch(e.target.value)}
+                        placeholder="Search drugs (e.g. Paracetamol, Amoxicillin)…"
+                        style={{ width: "100%", padding: "9px 10px 9px 30px", border: `1.5px solid ${C.pink}`, borderRadius: 7, fontSize: 13, fontFamily: "inherit", boxSizing: "border-box" }}
+                      />
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: 10 }}>
-                    <Btn color={C.green} onClick={() => dispenseAndCollect(entry)} disabled={saving}>
-                      <CheckCircle size={13} /> {saving ? "Processing…" : "Confirm — Close Visit & Record Payment"}
-                    </Btn>
-                    <Btn outline onClick={() => setActive(null)}>Cancel</Btn>
+
+                  {/* Dropdown */}
+                  {drugSearch.trim() && (
+                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 20, background: "#fff", border: `1.5px solid ${C.border}`, borderRadius: 8, marginTop: 4, maxHeight: 220, overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>
+                      {drugFiltered.length === 0 ? (
+                        <div style={{ padding: 14, fontSize: 12, color: C.textLight, textAlign: "center" }}>No drugs matching "{drugSearch}"</div>
+                      ) : drugFiltered.map(d => (
+                        <div key={d.id} onClick={() => addDrug(d)}
+                          style={{ padding: "10px 14px", cursor: "pointer", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                          onMouseEnter={e => e.currentTarget.style.background = "#fdf2ff"}
+                          onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                          <div style={{ fontWeight: 600, fontSize: 13 }}>💊 {d.name}</div>
+                          <div style={{ fontWeight: 700, color: C.green, fontSize: 13 }}>UGX {d.price.toLocaleString()}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Custom drug entry */}
+                <div style={{ display: "flex", gap: 6, alignItems: "flex-end", paddingTop: 10, borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: 10, fontWeight: 700, color: C.textLight, textTransform: "uppercase", display: "block", marginBottom: 3 }}>Custom Drug</label>
+                    <input value={customDrug.name} onChange={e => setCustomDrug(c => ({ ...c, name: e.target.value }))} placeholder="Drug name"
+                      style={{ width: "100%", border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px 8px", fontSize: 12, fontFamily: "inherit", boxSizing: "border-box" }} />
+                  </div>
+                  <div style={{ width: 110 }}>
+                    <label style={{ fontSize: 10, fontWeight: 700, color: C.textLight, textTransform: "uppercase", display: "block", marginBottom: 3 }}>Price</label>
+                    <input type="number" value={customDrug.price} onChange={e => setCustomDrug(c => ({ ...c, price: e.target.value }))} placeholder="UGX"
+                      style={{ width: "100%", border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px 8px", fontSize: 12, fontFamily: "inherit", boxSizing: "border-box" }} />
+                  </div>
+                  <Btn small outline color={C.pink} onClick={addCustomDrug}>+ Add</Btn>
+                </div>
+
+                {/* Added drugs list */}
+                {addedDrugs.length > 0 && (
+                  <div style={{ marginTop: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: C.textMid, textTransform: "uppercase", marginBottom: 6 }}>Drugs to Dispense</div>
+                    {addedDrugs.map(d => (
+                      <div key={d.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: `1px solid ${C.border}` }}>
+                        <div style={{ flex: 1, fontWeight: 600, fontSize: 12 }}>💊 {d.name}</div>
+                        <div style={{ fontSize: 11, color: C.textMid }}>UGX {d.price.toLocaleString()} each</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                          <button onClick={() => updateDrugQty(d.name, d.qty - 1)} style={{ width: 20, height: 20, borderRadius: "50%", border: `1px solid ${C.border}`, background: "#f8fafc", cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
+                          <span style={{ fontWeight: 700, fontSize: 12, minWidth: 18, textAlign: "center" }}>{d.qty}</span>
+                          <button onClick={() => updateDrugQty(d.name, d.qty + 1)} style={{ width: 20, height: 20, borderRadius: "50%", border: `1px solid ${C.border}`, background: "#f8fafc", cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+                        </div>
+                        <div style={{ fontWeight: 700, color: C.green, fontSize: 12, minWidth: 80, textAlign: "right" }}>UGX {(d.price * d.qty).toLocaleString()}</div>
+                        <button onClick={() => removeDrug(d.name)} style={{ background: "none", border: "none", cursor: "pointer", color: C.red, fontSize: 14 }}>×</button>
+                      </div>
+                    ))}
+                    <div style={{ textAlign: "right", fontWeight: 700, color: C.pink, fontSize: 13, marginTop: 6 }}>
+                      Drugs subtotal: UGX {drugsTotal.toLocaleString()}
+                    </div>
+                  </div>
+                )}
+              </Card>
+
+              {/* Grand total + payment */}
+              <Card title="💳 Payment Summary">
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14, fontSize: 13 }}>
+                  <div style={{ background: "#f8fafc", borderRadius: 8, padding: "10px 14px" }}>
+                    <div style={{ fontSize: 10, color: C.textLight, textTransform: "uppercase", marginBottom: 3 }}>Previous Charges</div>
+                    <div style={{ fontWeight: 700, color: C.text }}>UGX {existingTotal.toLocaleString()}</div>
+                  </div>
+                  <div style={{ background: "#fdf2ff", borderRadius: 8, padding: "10px 14px" }}>
+                    <div style={{ fontSize: 10, color: C.textLight, textTransform: "uppercase", marginBottom: 3 }}>Drugs Added</div>
+                    <div style={{ fontWeight: 700, color: C.pink }}>UGX {drugsTotal.toLocaleString()}</div>
                   </div>
                 </div>
-              )}
-            </Card>
+
+                <div style={{ background: C.greenLight, borderRadius: 9, padding: "14px 18px", marginBottom: 14 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 800, fontSize: 20, color: C.green }}>
+                    <span>GRAND TOTAL</span>
+                    <span>UGX {grandTotal.toLocaleString()}</span>
+                  </div>
+                  {alreadyPaid > 0 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: C.textMid, marginTop: 4 }}>
+                      <span>Already paid</span><span>−UGX {alreadyPaid.toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 700, color: balanceDue > 0 ? C.red : C.green, marginTop: 4 }}>
+                    <span>Balance Due</span><span>UGX {Math.max(0, balanceDue).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 160px", gap: 10, marginBottom: 14 }}>
+                  <div>
+                    <label style={{ fontSize: 10, fontWeight: 700, color: C.textMid, textTransform: "uppercase", display: "block", marginBottom: 4 }}>Amount to Collect (UGX)</label>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <input type="number" value={payAmt} onChange={e => setPayAmt(e.target.value)} placeholder={`${Math.max(0, balanceDue)}`}
+                        style={{ flex: 1, border: `1.5px solid ${C.green}`, borderRadius: 7, padding: "8px 10px", fontSize: 14, fontFamily: "'IBM Plex Mono',monospace", fontWeight: 700, boxSizing: "border-box" }} />
+                      <Btn small outline color={C.green} onClick={() => setPayAmt(String(Math.max(0, balanceDue)))}>Full</Btn>
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 10, fontWeight: 700, color: C.textMid, textTransform: "uppercase", display: "block", marginBottom: 4 }}>Method</label>
+                    <select value={payMethod} onChange={e => setPayMethod(e.target.value)}
+                      style={{ width: "100%", border: `1.5px solid ${C.border}`, borderRadius: 7, padding: "8px", fontSize: 13, fontFamily: "inherit", boxSizing: "border-box" }}>
+                      {["Cash", "Mobile Money", "Insurance", "Waiver"].map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <Btn color={C.green} onClick={() => dispenseAndCollect(entry)} disabled={saving} style={{ width: "100%" }}>
+                  <CheckCircle size={14} /> {saving ? "Processing…" : "Dispense, Bill & Close Visit"}
+                </Btn>
+              </Card>
+            </>
           );
-        })}
+        })()}
+      </div>
     </div>
   );
 }

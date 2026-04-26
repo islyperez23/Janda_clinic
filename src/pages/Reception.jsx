@@ -58,6 +58,18 @@ export function PatientRegistration({ patients, setPatients, reload }) {
         specialist: form.specialist,
       });
 
+      // Auto-create bill with consultation fee
+      const consultFee = form.specialist === "Dentist" ? 25000 : 30000;
+      const consultName = form.specialist === "Dentist" ? "Dental Consultation" : "Doctor Consultation";
+      try {
+        await api.createBill({
+          patientId: id,
+          patientName: fullName,
+          services: [{ serviceId:"auto", name:consultName, price:consultFee, qty:1, subtotal:consultFee, category:"Consultation" }],
+          totalAmount: consultFee,
+        });
+      } catch(e) { console.warn("Auto-bill creation failed:", e); }
+
       setPatients(prev => [...prev, patient]);
       setDone({ id, name: fullName, specialist: form.specialist });
       setForm({ ...blank, arrivalTime: now() });

@@ -40,8 +40,8 @@
     "requestedBy": "Dr. James Okello"
   },
   {
-    "status": "pending",
-    "result": "",
+    "status": "completed",
+    "result": "m+",
     "timestamp": "10:40 PM",
     "id": "LAB1776368451125",
     "patientId": "HMS26-3062",
@@ -50,13 +50,35 @@
     "requestedBy": "Dr. James Okello"
   },
   {
-    "status": "pending",
-    "result": "",
+    "status": "completed",
+    "result": "m++",
     "timestamp": "02:41 PM",
     "id": "LAB1776858116450",
     "patientId": "HMS26-7890",
     "patientName": "tendo israel perez",
     "test": "malar",
+    "requestedBy": "Dr. James Okello"
+  },
+  {
+    "status": "completed",
+    "result": "mp++",
+    "timestamp": "03:02 PM",
+    "id": "LAB1777032168216",
+    "patientId": "HMS26-7484",
+    "patientName": "emma tyrone kizito",
+    "test": "Malaria RDT",
+    "price": 10000,
+    "requestedBy": "Dr. James Okello"
+  },
+  {
+    "status": "completed",
+    "result": "m++",
+    "timestamp": "10:40 PM",
+    "id": "LAB1777232437766",
+    "patientId": "HMS26-2580",
+    "patientName": "shrek the donkey",
+    "test": "Malaria RDT",
+    "price": 10000,
     "requestedBy": "Dr. James Okello"
   }
 ]

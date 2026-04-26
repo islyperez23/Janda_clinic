@@ -1275,5 +1275,405 @@
       "test": "malar",
       "patient": "tendo israel perez"
     }
+  },
+  {
+    "id": "AUD17768610060086s6",
+    "timestamp": "2026-04-22T12:30:06.008Z",
+    "user": "doctor (doctor)",
+    "action": "PATIENT_UPDATE",
+    "detail": {
+      "id": "HMS26-7890"
+    }
+  },
+  {
+    "id": "AUD1776861054242844",
+    "timestamp": "2026-04-22T12:30:54.242Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1776864682503e9n",
+    "timestamp": "2026-04-22T13:31:22.511Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777011026408cnw",
+    "timestamp": "2026-04-24T06:10:26.408Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD177701555170610b",
+    "timestamp": "2026-04-24T07:25:51.720Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777015650187e4m",
+    "timestamp": "2026-04-24T07:27:30.198Z",
+    "user": "receptionist (receptionist)",
+    "action": "PATIENT_REGISTER",
+    "detail": {
+      "id": "HMS26-7484",
+      "name": "emma tyrone kizito"
+    }
+  },
+  {
+    "id": "AUD17770156615052lq",
+    "timestamp": "2026-04-24T07:27:41.513Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17770159087584cd",
+    "timestamp": "2026-04-24T07:31:48.758Z",
+    "user": "lab (lab)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17770159409209s7",
+    "timestamp": "2026-04-24T07:32:20.920Z",
+    "user": "lab (lab)",
+    "action": "LAB_RESULT",
+    "detail": {
+      "id": "LAB1776858116450"
+    }
+  },
+  {
+    "id": "AUD1777015948556dwb",
+    "timestamp": "2026-04-24T07:32:28.556Z",
+    "user": "lab (lab)",
+    "action": "LAB_RESULT",
+    "detail": {
+      "id": "LAB1776368451125"
+    }
+  },
+  {
+    "id": "AUD1777015964252nx4",
+    "timestamp": "2026-04-24T07:32:44.252Z",
+    "user": "nurse (nurse)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777016013132pjd",
+    "timestamp": "2026-04-24T07:33:33.132Z",
+    "user": "nurse (nurse)",
+    "action": "PATIENT_UPDATE",
+    "detail": {
+      "id": "HMS26-9404"
+    }
+  },
+  {
+    "id": "AUD1777016059708jr5",
+    "timestamp": "2026-04-24T07:34:19.715Z",
+    "user": "nurse (nurse)",
+    "action": "PATIENT_UPDATE",
+    "detail": {
+      "id": "HMS26-7484"
+    }
+  },
+  {
+    "id": "AUD1777016075767rb0",
+    "timestamp": "2026-04-24T07:34:35.767Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17770161725628ll",
+    "timestamp": "2026-04-24T07:36:12.562Z",
+    "user": "lab (lab)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777016192597obp",
+    "timestamp": "2026-04-24T07:36:32.597Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777016251841rd4",
+    "timestamp": "2026-04-24T07:37:31.841Z",
+    "user": "doctor (doctor)",
+    "action": "PATIENT_UPDATE",
+    "detail": {
+      "id": "HMS26-9404"
+    }
+  },
+  {
+    "id": "AUD1777016299968cz0",
+    "timestamp": "2026-04-24T07:38:19.968Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777016498993m29",
+    "timestamp": "2026-04-24T07:41:38.993Z",
+    "user": "admin (admin)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17770166010016mr",
+    "timestamp": "2026-04-24T07:43:21.001Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777030835902lbo",
+    "timestamp": "2026-04-24T11:40:35.902Z",
+    "user": "anonymous",
+    "action": "LOGIN_FAIL",
+    "detail": {
+      "username": "store"
+    }
+  },
+  {
+    "id": "AUD1777030848163128",
+    "timestamp": "2026-04-24T11:40:48.163Z",
+    "user": "admin (admin)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777030891608hfs",
+    "timestamp": "2026-04-24T11:41:31.608Z",
+    "user": "admin (admin)",
+    "action": "ACCOUNT_CREATE",
+    "detail": {
+      "username": "ti",
+      "role": "store"
+    }
+  },
+  {
+    "id": "AUD1777030913892ac4",
+    "timestamp": "2026-04-24T11:41:53.892Z",
+    "user": "ti (store)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD177703117871863g",
+    "timestamp": "2026-04-24T11:46:18.718Z",
+    "user": "ti (store)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17770321317579a8",
+    "timestamp": "2026-04-24T12:02:11.757Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777032168866q0y",
+    "timestamp": "2026-04-24T12:02:48.868Z",
+    "user": "doctor (doctor)",
+    "action": "LAB_ORDER",
+    "detail": {
+      "test": "Malaria RDT",
+      "patient": "emma tyrone kizito"
+    }
+  },
+  {
+    "id": "AUD1777032179886li6",
+    "timestamp": "2026-04-24T12:02:59.886Z",
+    "user": "lab (lab)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD177703219098277j",
+    "timestamp": "2026-04-24T12:03:10.982Z",
+    "user": "lab (lab)",
+    "action": "LAB_RESULT",
+    "detail": {
+      "id": "LAB1777032168216"
+    }
+  },
+  {
+    "id": "AUD1777032197907zjt",
+    "timestamp": "2026-04-24T12:03:17.907Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777032308106vwv",
+    "timestamp": "2026-04-24T12:05:08.106Z",
+    "user": "doctor (doctor)",
+    "action": "PATIENT_UPDATE",
+    "detail": {
+      "id": "HMS26-7484"
+    }
+  },
+  {
+    "id": "AUD1777032339127c3w",
+    "timestamp": "2026-04-24T12:05:39.127Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777232207213gga",
+    "timestamp": "2026-04-26T19:36:47.213Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777232221050nqm",
+    "timestamp": "2026-04-26T19:37:01.050Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777232243304iv6",
+    "timestamp": "2026-04-26T19:37:23.304Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17772322527200su",
+    "timestamp": "2026-04-26T19:37:32.721Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17772324002655mt",
+    "timestamp": "2026-04-26T19:40:00.265Z",
+    "user": "receptionist (receptionist)",
+    "action": "PATIENT_REGISTER",
+    "detail": {
+      "id": "HMS26-2580",
+      "name": "shrek the donkey"
+    }
+  },
+  {
+    "id": "AUD1777232400897gmh",
+    "timestamp": "2026-04-26T19:40:00.897Z",
+    "user": "receptionist (receptionist)",
+    "action": "BILL_CREATED",
+    "detail": {
+      "id": "BILL1777232400897",
+      "patient": "shrek the donkey",
+      "total": 30000
+    }
+  },
+  {
+    "id": "AUD1777232406876ful",
+    "timestamp": "2026-04-26T19:40:06.876Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777232437774dbf",
+    "timestamp": "2026-04-26T19:40:37.774Z",
+    "user": "doctor (doctor)",
+    "action": "LAB_ORDER",
+    "detail": {
+      "test": "Malaria RDT",
+      "patient": "shrek the donkey"
+    }
+  },
+  {
+    "id": "AUD1777232449211imt",
+    "timestamp": "2026-04-26T19:40:49.212Z",
+    "user": "lab (lab)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777232457316uwq",
+    "timestamp": "2026-04-26T19:40:57.316Z",
+    "user": "lab (lab)",
+    "action": "LAB_RESULT",
+    "detail": {
+      "id": "LAB1777232437766"
+    }
+  },
+  {
+    "id": "AUD17772324645642vg",
+    "timestamp": "2026-04-26T19:41:04.564Z",
+    "user": "nurse (nurse)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777232583496tkx",
+    "timestamp": "2026-04-26T19:43:03.496Z",
+    "user": "nurse (nurse)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777232599451zt7",
+    "timestamp": "2026-04-26T19:43:19.451Z",
+    "user": "nurse (nurse)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD177723260569739f",
+    "timestamp": "2026-04-26T19:43:25.697Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777232722404sv6",
+    "timestamp": "2026-04-26T19:45:22.404Z",
+    "user": "doctor (doctor)",
+    "action": "PATIENT_UPDATE",
+    "detail": {
+      "id": "HMS26-2580"
+    }
+  },
+  {
+    "id": "AUD1777233496302dp8",
+    "timestamp": "2026-04-26T19:58:16.302Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777233539060zvp",
+    "timestamp": "2026-04-26T19:58:59.060Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "BILL_PAYMENT",
+    "detail": {
+      "billId": "BILL1777232400897",
+      "amount": 42500,
+      "method": "Cash",
+      "balance": 0
+    }
+  },
+  {
+    "id": "AUD1777233539153i6q",
+    "timestamp": "2026-04-26T19:58:59.153Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "TRANSACTION",
+    "detail": {
+      "id": "TXN-20260426-787",
+      "amount": 42500,
+      "patient": "shrek the donkey"
+    }
   }
 ]

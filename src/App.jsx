@@ -48,7 +48,7 @@ function LoginScreen({ onLogin }) {
         <div style={{ marginTop:22, padding:14, background:"rgba(255,255,255,0.04)", borderRadius:10, border:"1px solid rgba(255,255,255,0.07)" }}>
           <p style={{ color:"rgba(255,255,255,0.35)", fontSize:10, margin:"0 0 8px", fontWeight:700, letterSpacing:"0.08em" }}>DEMO — click to auto-fill (password: 1234)</p>
           <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
-            {[["receptionist","1234"],["doctor","1234"],["incharge","1234"],["lab","1234"],["pharmacy","1234"],["accountant","1234"],["director","1234"],["admin","admin"]].map(([u,p])=>(
+            {[["receptionist","1234"],["doctor","1234"],["nurse","1234"],["store","1234"],["incharge","1234"],["lab","1234"],["pharmacy","1234"],["accountant","1234"],["director","1234"],["admin","admin"]].map(([u,p])=>(
               <span key={u} onClick={()=>demo(u,p)} style={{ cursor:"pointer", background:"rgba(34,211,238,0.12)", color:C.accent, borderRadius:4, padding:"2px 8px", fontSize:10, fontWeight:600, border:"1px solid rgba(34,211,238,0.2)" }}>{u}</span>
             ))}
           </div>
@@ -104,6 +104,10 @@ function Sidebar({ user, activeTab, setTab, onLogout, queueCount, lowStockCount,
       { id:"billing",      icon:<DollarSign size={15}/>,   label:"Bills & Payments" },
       { id:"debtors",      icon:<AlertCircle size={15}/>,  label:"Debtors" },
       { id:"services",     icon:<Package size={15}/>,       label:"Service Price List" },
+      { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
+    ],
+    store:[
+      { id:"services",     icon:<Package size={15}/>,       label:"Manage Services & Prices" },
       { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
     ],
     director:[
@@ -238,6 +242,7 @@ export default function App() {
   const [inventory, setInventory] = useState([]);
   const [bills, setBills]         = useState([]);
   const [admissions, setAdmissions] = useState([]);
+  const [services, setServices]   = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -254,7 +259,7 @@ export default function App() {
       const canBills = ["receptionist","pharmacy","accountant","director","incharge","admin"].includes(currentUser.role);
       const canAdmit = ["doctor","dentist","incharge","director","admin"].includes(currentUser.role);
 
-      const [p,q,qa,appt,inv,lab,txn,acc,bil,adm] = await Promise.allSettled([
+      const [p,q,qa,appt,inv,lab,txn,acc,bil,adm,svc] = await Promise.allSettled([
         api.getPatients(),
         api.getQueue(),
         api.getQueueArchive(),
@@ -265,6 +270,7 @@ export default function App() {
         canAdmin ? api.getAccounts()     : Promise.resolve([]),
         canBills ? api.getBills()        : Promise.resolve([]),
         canAdmit ? api.getAdmissions()   : Promise.resolve([]),
+        api.getServices(),
       ]);
 
       const val = (r, fb=[]) => r.status === "fulfilled" ? r.value : fb;
@@ -278,8 +284,9 @@ export default function App() {
       setAccounts(val(acc));
       setBills(val(bil));
       setAdmissions(val(adm));
+      setServices(val(svc));
 
-      [p,q,qa,appt,inv,lab,txn,acc,bil,adm].forEach((r,i) => {
+      [p,q,qa,appt,inv,lab,txn,acc,bil,adm,svc].forEach((r,i) => {
         if (r.status === "rejected") console.warn(`loadData[${i}] failed:`, r.reason);
       });
     } catch(e){ console.error("loadData fatal:", e); } finally{ setLoading(false); }
@@ -292,7 +299,7 @@ export default function App() {
 
   const handleLogin = (user) => {
     setCurrentUser(user);
-    const defaults = { receptionist:"register", doctor:"myqueue", nurse:"vitals", lab:"labpending", pharmacy:"pharmacyqueue", accountant:"financials", director:"dashboard", incharge:"incharge", admin:"accounts", dentist:"dentalqueue" };
+    const defaults = { receptionist:"register", doctor:"myqueue", nurse:"vitals", store:"services", lab:"labpending", pharmacy:"pharmacyqueue", accountant:"financials", director:"dashboard", incharge:"incharge", admin:"accounts", dentist:"dentalqueue" };
     setActiveTab(defaults[user.role]||"");
   };
 
@@ -316,7 +323,7 @@ export default function App() {
   };
 
   const renderContent = () => {
-    const props = { patients, setPatients, queue, queueArchive, labOrders, transactions, accounts, inventory, appointments, bills, setBills, admissions, selectedPatient, setSelectedPatient, setTab:setActiveTab, user:currentUser, reload:loadData };
+    const props = { patients, setPatients, queue, queueArchive, labOrders, transactions, accounts, inventory, appointments, bills, setBills, admissions, services, selectedPatient, setSelectedPatient, setTab:setActiveTab, user:currentUser, reload:loadData };
     switch(activeTab) {
       case "register":      return <PatientRegistration {...props}/>;
       case "queue":
