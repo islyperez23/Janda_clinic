@@ -10,22 +10,26 @@ import { api } from "../api";
 export function ServicePriceList() {
   const [services, setServices]   = useState([]);
   const [showAdd, setShowAdd]     = useState(false);
-  const [form, setForm]           = useState({ name:"", category:"Consultation", price:"" });
+  const [form, setForm]           = useState({ name:"", category:"Consultation", price:"", insurancePrice:"" });
   const [err, setErr]             = useState("");
   const [filter, setFilter]       = useState("all");
   const set = (k,v) => setForm(f => ({...f,[k]:v}));
 
-  const cats = ["Consultation","Laboratory","Dental","Pharmacy","Admission","Procedure","Other"];
+  const cats = ["Consultation","Laboratory","Dental","Pharmacy","Maternity","Sonography","Admission","Procedure","Other"];
 
   useEffect(() => { api.getServices().then(setServices).catch(console.warn); }, []);
 
   const save = async () => {
-    if (!form.name || !form.price) { setErr("Name and price are required."); return; }
+    if (!form.name || !form.price) { setErr("Name and standard price are required."); return; }
     setErr("");
     try {
-      const svc = await api.addService({ ...form, price: parseInt(form.price) });
+      const svc = await api.addService({
+        ...form,
+        price: parseInt(form.price),
+        insurancePrice: form.insurancePrice ? parseInt(form.insurancePrice) : Math.round(parseInt(form.price)*0.7),
+      });
       setServices(s => [...s, svc]);
-      setForm({ name:"", category:"Consultation", price:"" });
+      setForm({ name:"", category:"Consultation", price:"", insurancePrice:"" });
       setShowAdd(false);
     } catch(e) { setErr(e.message); }
   };
@@ -37,13 +41,13 @@ export function ServicePriceList() {
     } catch(e) { alert(e.message); }
   };
 
-  const catColor = { Consultation:C.green, Laboratory:C.amber, Dental:C.blue, Pharmacy:C.pink, Admission:C.purple, Procedure:C.accent, Other:C.textMid };
+  const catColor = { Consultation:C.green, Laboratory:C.amber, Dental:C.blue, Pharmacy:C.pink, Maternity:"#db2777", Sonography:"#7c3aed", Admission:C.purple, Procedure:C.accent, Other:C.textMid };
   const displayed = filter==="all" ? services : services.filter(s => s.category===filter);
 
   return (
     <div style={{ padding:24 }}>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
-        <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16, flexWrap:"wrap", gap:10 }}>
+        <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
           {["all",...cats].map(c => (
             <Btn key={c} small outline={filter!==c} color={catColor[c]||C.accent} onClick={()=>setFilter(c)} style={{ textTransform:"capitalize" }}>{c==="all"?"All":c}</Btn>
           ))}
@@ -54,10 +58,14 @@ export function ServicePriceList() {
       {showAdd && (
         <Card style={{ marginBottom:16, border:`1.5px solid ${C.accent}` }}>
           <ErrBanner err={err}/>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 160px auto", gap:12, alignItems:"end" }}>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 150px 150px auto", gap:12, alignItems:"end" }}>
             <Input label="Service Name" value={form.name} onChange={v=>set("name",v)} placeholder="e.g. Blood Smear Test"/>
             <Select label="Category" value={form.category} onChange={v=>set("category",v)} options={cats}/>
-            <Input label="Price (UGX)" value={form.price} onChange={v=>set("price",v)} type="number" placeholder="e.g. 15000"/>
+            <Input label="Standard Price (UGX) ★" value={form.price} onChange={v=>set("price",v)} type="number" placeholder="e.g. 15000"/>
+            <div>
+              <Input label="Insurance Price (UGX)" value={form.insurancePrice} onChange={v=>set("insurancePrice",v)} type="number" placeholder="auto (70%)"/>
+              <div style={{ fontSize:9, color:C.textLight, marginTop:2 }}>Leave blank for 70% of standard</div>
+            </div>
             <div style={{ display:"flex", gap:8 }}>
               <Btn color={C.green} onClick={save}><CheckCircle size={13}/> Save</Btn>
               <Btn outline onClick={()=>setShowAdd(false)}>Cancel</Btn>
@@ -66,17 +74,24 @@ export function ServicePriceList() {
         </Card>
       )}
 
-      <Card title={`Service Catalogue (${displayed.length})`}>
+      <Card title={`Service Catalogue (${displayed.length}) — Dual Pricing`}>
         <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
           <thead><tr style={{ borderBottom:`2px solid ${C.border}` }}>
-            {["Service","Category","Price (UGX)","Status",""].map(h=><th key={h} style={{ textAlign:"left",padding:"7px 10px",fontSize:11,color:C.textLight,fontWeight:700,textTransform:"uppercase" }}>{h}</th>)}
+            {["Service","Category","Standard Price","Insurance Price","Status",""].map(h=>(
+              <th key={h} style={{ textAlign:"left",padding:"7px 10px",fontSize:11,color:C.textLight,fontWeight:700,textTransform:"uppercase" }}>{h}</th>
+            ))}
           </tr></thead>
           <tbody>
             {displayed.map(s=>(
               <tr key={s.id} style={{ borderBottom:`1px solid ${C.border}`, opacity:s.active?1:0.45 }}>
                 <td style={{ padding:"10px" }}><div style={{ fontWeight:600 }}>{s.name}</div></td>
                 <td style={{ padding:"10px" }}><Badge label={s.category} color={catColor[s.category]||C.accent}/></td>
-                <td style={{ padding:"10px", fontWeight:700, color:C.green, fontFamily:"'IBM Plex Mono',monospace" }}>UGX {s.price.toLocaleString()}</td>
+                <td style={{ padding:"10px", fontWeight:700, color:C.green, fontFamily:"'IBM Plex Mono',monospace" }}>
+                  UGX {(s.price||0).toLocaleString()}
+                </td>
+                <td style={{ padding:"10px", fontWeight:700, color:C.blue, fontFamily:"'IBM Plex Mono',monospace" }}>
+                  UGX {(s.insurancePrice||Math.round((s.price||0)*0.7)).toLocaleString()}
+                </td>
                 <td style={{ padding:"10px" }}><Badge label={s.active?"Active":"Inactive"} color={s.active?C.green:C.textLight}/></td>
                 <td style={{ padding:"10px" }}><Btn small outline color={s.active?C.red:C.green} onClick={()=>toggle(s.id,s.active)}>{s.active?"Disable":"Enable"}</Btn></td>
               </tr>

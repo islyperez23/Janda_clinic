@@ -619,5 +619,28 @@
     "emergencyContact": "",
     "arrivalTime": "10:37 PM",
     "registeredAt": "2026-04-26"
+  },
+  {
+    "pendingVitals": null,
+    "visits": [],
+    "id": "HMS26-8233",
+    "name": "less twin",
+    "firstName": "less",
+    "secondName": "twin",
+    "otherName": "",
+    "dob": "2002-09-25",
+    "gender": "F",
+    "phone": "",
+    "category": "Outpatient",
+    "class": "",
+    "employeeId": "",
+    "department": "",
+    "emergencyContact": "",
+    "insuranceProvider": "",
+    "insuranceNumber": "",
+    "arrivalTime": "09:00 PM",
+    "registeredAt": "2026-04-28",
+    "isFree": false,
+    "isInsurance": false
   }
 ]

@@ -1019,8 +1019,11 @@ export function PharmacyView({ patients, queue, services, bills, setBills, user,
   const [saving, setSaving]   = useState(false);
   const [customDrug, setCustomDrug] = useState({ name:"", price:"" });
 
-  // Drug catalogue from services
-  const allDrugs = (services||[]).filter(s => s.active && s.category === "Pharmacy");
+  // Drug catalogue — show correct price based on patient category
+  const getPrice = (drug, pat) => {
+    if (!pat) return drug.price;
+    return pat.isInsurance ? (drug.insurancePrice || drug.price) : drug.price;
+  };
   const drugFiltered = drugSearch.trim()
     ? allDrugs.filter(d => d.name.toLowerCase().includes(drugSearch.toLowerCase()))
     : allDrugs;

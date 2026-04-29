@@ -48,5 +48,19 @@
       }
     ],
     "totalAmount": 42500
+  },
+  {
+    "id": "BILL1777399417770",
+    "date": "2026-04-28",
+    "amountPaid": 0,
+    "balance": 0,
+    "status": "unpaid",
+    "payments": [],
+    "createdBy": "Grace Nalwoga",
+    "patientId": "HMS26-8233",
+    "patientName": "less twin",
+    "services": [],
+    "totalAmount": 0,
+    "paymentCategory": "standard"
   }
 ]

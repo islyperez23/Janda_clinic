@@ -1,28 +1,50 @@
 {
-  "name": "janda",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "hms-portal",
+  "productName": "HMS Portal",
+  "version": "1.0.0",
+  "description": "Hospital Management System",
+  "author": "HMS Medical Centre",
+  "main": "electron/main.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev":              "vite",
+    "build":            "vite build",
+    "electron:dev":     "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:build":   "npm run build && electron-builder --linux dir",
+    "electron:run":     "~/Desktop/HMS/dist/linux-unpacked/janda"
   },
-  "dependencies": {
-    "lucide-react": "^1.8.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+  "build": {
+    "appId": "com.hms.portal",
+    "productName": "HMS Portal",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/main.js"
+    ],
+    "extraResources": [
+      {
+        "from": "HMS-backend",
+        "to":   "HMS-backend",
+        "filter": ["**/*", "!node_modules/.cache/**", "!**/*.log"]
+      }
+    ],
+    "linux": {
+      "target": ["dir"],
+      "category": "Office"
+    }
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.1",
-    "eslint": "^9.39.4",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.5.2",
-    "globals": "^17.4.0",
-    "vite": "^8.0.4"
+    "@vitejs/plugin-react": "^4.0.0",
+    "concurrently": "^8.0.0",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.0.0",
+    "vite": "^8.0.0",
+    "wait-on": "^7.0.0"
+  },
+  "dependencies": {
+    "lucide-react": "^0.383.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }

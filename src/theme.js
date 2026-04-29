@@ -16,7 +16,8 @@ export const ROLES = {
   doctor:      { label:"Doctor",        color:C.green,     icon:"👨‍⚕️" },
   nurse:       { label:"Nurse",         color:C.purple,    icon:"👩‍⚕️" },
   incharge:    { label:"In-Charge",     color:"#06b6d4",   icon:"🩺" },
-  store:       { label:"Store",         color:"#ea580c",   icon:"📦" },
+  maternity:   { label:"Maternity",     color:"#db2777",   icon:"🤱" },
+  sonography:  { label:"Sonography",    color:"#7c3aed",   icon:"🔊" },
   lab:         { label:"Laboratory",    color:C.amber,     icon:"🔬" },
   pharmacy:    { label:"Pharmacy",      color:C.pink,      icon:"💊" },
   dentist:     { label:"Dentist",       color:C.blue,      icon:"🦷" },
@@ -25,14 +26,35 @@ export const ROLES = {
   admin:       { label:"System Admin",  color:C.textLight, icon:"⚙️" },
 };
 
-export const CATEGORIES = ["NSVS (Secondary)","Samaritan (Primary)","Staff","Outpatient"];
+export const CATEGORIES = [
+  "Outpatient",
+  "Insurance",
+  "NSVS (Secondary)",
+  "Samaritan (Primary)",
+  "Staff",
+  "ANC / Maternity",
+];
+
+// Categories that are NOT billed — their care is covered
+export const FREE_CATEGORIES = ["NSVS (Secondary)", "Samaritan (Primary)", "Staff"];
+
+// Category → payment method hint shown in pharmacy
+export const CATEGORY_PAYMENT = {
+  "Insurance":        "Insurance",
+  "Outpatient":       "Cash",
+  "ANC / Maternity":  "Cash",
+  "Staff":            "Waiver",
+  "NSVS (Secondary)": "Waiver",
+  "Samaritan (Primary)": "Waiver",
+};
+
 export const DRUG_CATEGORIES = ["Antimalarial","Antibiotic","Analgesic","Antihypertensive","Rehydration","Anti-inflammatory","Antifungal","Antiviral","Vitamin/Supplement","Consumable","Other"];
 
 export const STAGE_LABELS = { reception:"Reception", nurse:"Nurse (Vitals)", doctor:"Doctor", lab:"Laboratory", pharmacy:"Pharmacy", dentist:"Dentist", payment:"Awaiting Payment", done:"Completed" };
 export const STAGE_COLOR  = { reception:C.textMid, nurse:C.purple, doctor:C.green, lab:C.amber, pharmacy:C.pink, dentist:C.blue, payment:C.green, done:C.textLight };
 export const STAGE_ORDER  = ["reception","nurse","doctor","lab","pharmacy","dentist","done"];
 
-export const now   = () => new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+export const now = () => new Date().toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit", hour12:false });
 export const today = () => new Date().toISOString().slice(0, 10);
 
 export const genId  = (prefix) => `${prefix}${new Date().getFullYear().toString().slice(-2)}-${Math.floor(1000+Math.random()*9000)}`;

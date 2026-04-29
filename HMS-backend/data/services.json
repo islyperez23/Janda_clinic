@@ -1,205 +1,42 @@
 [
-  {
-    "id": "SVC001",
-    "name": "Doctor Consultation",
-    "category": "Consultation",
-    "price": 30000,
-    "active": true
-  },
-  {
-    "id": "SVC002",
-    "name": "Dental Consultation",
-    "category": "Consultation",
-    "price": 25000,
-    "active": true
-  },
-  {
-    "id": "SVC003",
-    "name": "Follow-up Consultation",
-    "category": "Consultation",
-    "price": 15000,
-    "active": true
-  },
-  {
-    "id": "SVC010",
-    "name": "Malaria RDT",
-    "category": "Laboratory",
-    "price": 10000,
-    "active": true
-  },
-  {
-    "id": "SVC011",
-    "name": "Full Blood Count",
-    "category": "Laboratory",
-    "price": 25000,
-    "active": true
-  },
-  {
-    "id": "SVC012",
-    "name": "Urinalysis",
-    "category": "Laboratory",
-    "price": 15000,
-    "active": true
-  },
-  {
-    "id": "SVC013",
-    "name": "HIV Test",
-    "category": "Laboratory",
-    "price": 10000,
-    "active": true
-  },
-  {
-    "id": "SVC014",
-    "name": "Blood Glucose",
-    "category": "Laboratory",
-    "price": 10000,
-    "active": true
-  },
-  {
-    "id": "SVC015",
-    "name": "Widal Test (Typhoid)",
-    "category": "Laboratory",
-    "price": 15000,
-    "active": true
-  },
-  {
-    "id": "SVC016",
-    "name": "Pregnancy Test",
-    "category": "Pharmacy",
-    "price": 8000,
-    "active": true
-  },
-  {
-    "id": "SVC020",
-    "name": "Tooth Extraction",
-    "category": "Dental",
-    "price": 50000,
-    "active": true
-  },
-  {
-    "id": "SVC021",
-    "name": "Dental Filling",
-    "category": "Dental",
-    "price": 80000,
-    "active": true
-  },
-  {
-    "id": "SVC022",
-    "name": "Scale & Polish",
-    "category": "Dental",
-    "price": 40000,
-    "active": true
-  },
-  {
-    "id": "SVC030",
-    "name": "Coartem (6 tabs)",
-    "category": "Pharmacy",
-    "price": 12000,
-    "active": true
-  },
-  {
-    "id": "SVC031",
-    "name": "Amoxicillin 500mg x10",
-    "category": "Pharmacy",
-    "price": 8000,
-    "active": true
-  },
-  {
-    "id": "SVC032",
-    "name": "Paracetamol 500mg x10",
-    "category": "Pharmacy",
-    "price": 3000,
-    "active": true
-  },
-  {
-    "id": "SVC033",
-    "name": "ORS Sachet",
-    "category": "Pharmacy",
-    "price": 2000,
-    "active": true
-  },
-  {
-    "id": "SVC034",
-    "name": "Ibuprofen 400mg x10",
-    "category": "Pharmacy",
-    "price": 5000,
-    "active": true
-  },
-  {
-    "id": "SVC035",
-    "name": "Amlodipine 5mg x30",
-    "category": "Pharmacy",
-    "price": 15000,
-    "active": true
-  },
-  {
-    "id": "SVC040",
-    "name": "Ward Admission Fee",
-    "category": "Admission",
-    "price": 50000,
-    "active": true
-  },
-  {
-    "id": "SVC041",
-    "name": "Ward Bed (per night)",
-    "category": "Admission",
-    "price": 30000,
-    "active": true
-  },
-  {
-    "id": "SVC042",
-    "name": "IV Drip Setup",
-    "category": "Admission",
-    "price": 20000,
-    "active": true
-  },
-  {
-    "id": "SVC043",
-    "name": "Nursing Care (per day)",
-    "category": "Admission",
-    "price": 15000,
-    "active": true
-  },
-  {
-    "id": "SVC050",
-    "name": "Dressing / Wound Care",
-    "category": "Procedure",
-    "price": 20000,
-    "active": true
-  },
-  {
-    "id": "SVC051",
-    "name": "Injection (IM/IV)",
-    "category": "Procedure",
-    "price": 10000,
-    "active": true
-  },
-  {
-    "id": "SVC1777032020925",
-    "active": true,
-    "category": "Consultation",
-    "name": "hiv",
-    "price": 10000
-  },
-  {
-    "id": "SVC1777032049063",
-    "active": true,
-    "category": "Pharmacy",
-    "name": "paracetamol",
-    "price": 500
-  },
-  {
-    "id": "SVC1777032091711",
-    "active": true,
-    "category": "Consultation",
-    "name": "ammoxcillin",
-    "price": 2000
-  },
-  {
-    "id": "SVC1777032122696",
-    "active": true,
-    "category": "Consultation",
-    "name": "coartem",
-    "price": 500
-  }
+  {"id":"SVC001","name":"Doctor Consultation","category":"Consultation","price":30000,"insurancePrice":20000,"active":true},
+  {"id":"SVC002","name":"Dental Consultation","category":"Consultation","price":25000,"insurancePrice":18000,"active":true},
+  {"id":"SVC003","name":"Follow-up Consultation","category":"Consultation","price":15000,"insurancePrice":10000,"active":true},
+  {"id":"SVC004","name":"ANC Visit","category":"Maternity","price":20000,"insurancePrice":15000,"active":true},
+  {"id":"SVC005","name":"Delivery (Normal)","category":"Maternity","price":150000,"insurancePrice":100000,"active":true},
+  {"id":"SVC006","name":"Delivery (C-Section)","category":"Maternity","price":500000,"insurancePrice":350000,"active":true},
+  {"id":"SVC007","name":"Postnatal Visit","category":"Maternity","price":15000,"insurancePrice":10000,"active":true},
+  {"id":"SVC008","name":"Family Planning Consultation","category":"Maternity","price":15000,"insurancePrice":10000,"active":true},
+  {"id":"SVC010","name":"Malaria RDT","category":"Laboratory","price":10000,"insurancePrice":7000,"active":true},
+  {"id":"SVC011","name":"Full Blood Count","category":"Laboratory","price":25000,"insurancePrice":18000,"active":true},
+  {"id":"SVC012","name":"Urinalysis","category":"Laboratory","price":15000,"insurancePrice":10000,"active":true},
+  {"id":"SVC013","name":"HIV Test","category":"Laboratory","price":10000,"insurancePrice":7000,"active":true},
+  {"id":"SVC014","name":"Blood Glucose","category":"Laboratory","price":10000,"insurancePrice":7000,"active":true},
+  {"id":"SVC015","name":"Widal Test (Typhoid)","category":"Laboratory","price":15000,"insurancePrice":10000,"active":true},
+  {"id":"SVC016","name":"Pregnancy Test","category":"Laboratory","price":8000,"insurancePrice":5000,"active":true},
+  {"id":"SVC017","name":"Liver Function Test","category":"Laboratory","price":35000,"insurancePrice":25000,"active":true},
+  {"id":"SVC018","name":"Urine Culture","category":"Laboratory","price":30000,"insurancePrice":22000,"active":true},
+  {"id":"SVC019","name":"CD4 Count","category":"Laboratory","price":40000,"insurancePrice":30000,"active":true},
+  {"id":"SVC020","name":"Tooth Extraction","category":"Dental","price":50000,"insurancePrice":35000,"active":true},
+  {"id":"SVC021","name":"Dental Filling","category":"Dental","price":80000,"insurancePrice":60000,"active":true},
+  {"id":"SVC022","name":"Scale & Polish","category":"Dental","price":40000,"insurancePrice":28000,"active":true},
+  {"id":"SVC025","name":"Obstetric Scan","category":"Sonography","price":50000,"insurancePrice":35000,"active":true},
+  {"id":"SVC026","name":"Abdominal Scan","category":"Sonography","price":60000,"insurancePrice":42000,"active":true},
+  {"id":"SVC027","name":"Pelvic Scan","category":"Sonography","price":55000,"insurancePrice":38000,"active":true},
+  {"id":"SVC028","name":"Cardiac Scan","category":"Sonography","price":80000,"insurancePrice":56000,"active":true},
+  {"id":"SVC029","name":"Thyroid Scan","category":"Sonography","price":60000,"insurancePrice":42000,"active":true},
+  {"id":"SVC030","name":"Coartem (6 tabs)","category":"Pharmacy","price":12000,"insurancePrice":9000,"active":true},
+  {"id":"SVC031","name":"Amoxicillin 500mg x10","category":"Pharmacy","price":8000,"insurancePrice":6000,"active":true},
+  {"id":"SVC032","name":"Paracetamol 500mg x10","category":"Pharmacy","price":3000,"insurancePrice":2000,"active":true},
+  {"id":"SVC033","name":"ORS Sachet","category":"Pharmacy","price":2000,"insurancePrice":1500,"active":true},
+  {"id":"SVC034","name":"Ibuprofen 400mg x10","category":"Pharmacy","price":5000,"insurancePrice":3500,"active":true},
+  {"id":"SVC035","name":"Amlodipine 5mg x30","category":"Pharmacy","price":15000,"insurancePrice":11000,"active":true},
+  {"id":"SVC036","name":"Folic Acid x30","category":"Pharmacy","price":5000,"insurancePrice":3500,"active":true},
+  {"id":"SVC037","name":"Iron Supplements x30","category":"Pharmacy","price":8000,"insurancePrice":6000,"active":true},
+  {"id":"SVC040","name":"Ward Admission Fee","category":"Admission","price":50000,"insurancePrice":35000,"active":true},
+  {"id":"SVC041","name":"Ward Bed (per night)","category":"Admission","price":30000,"insurancePrice":22000,"active":true},
+  {"id":"SVC042","name":"IV Drip Setup","category":"Admission","price":20000,"insurancePrice":14000,"active":true},
+  {"id":"SVC043","name":"Nursing Care (per day)","category":"Admission","price":15000,"insurancePrice":10000,"active":true},
+  {"id":"SVC050","name":"Dressing / Wound Care","category":"Procedure","price":20000,"insurancePrice":14000,"active":true},
+  {"id":"SVC051","name":"Injection (IM/IV)","category":"Procedure","price":10000,"insurancePrice":7000,"active":true}
 ]

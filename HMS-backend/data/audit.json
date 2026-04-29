@@ -1675,5 +1675,106 @@
       "amount": 42500,
       "patient": "shrek the donkey"
     }
+  },
+  {
+    "id": "AUD1777374404214lqt",
+    "timestamp": "2026-04-28T11:06:44.214Z",
+    "user": "nurse (nurse)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777374418595e9n",
+    "timestamp": "2026-04-28T11:06:58.595Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777374426572q5o",
+    "timestamp": "2026-04-28T11:07:06.572Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777374473579xpq",
+    "timestamp": "2026-04-28T11:07:53.579Z",
+    "user": "doctor (doctor)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777374491513lg9",
+    "timestamp": "2026-04-28T11:08:11.513Z",
+    "user": "nurse (nurse)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777398108021wpa",
+    "timestamp": "2026-04-28T17:41:48.021Z",
+    "user": "admin (admin)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777398193780vtr",
+    "timestamp": "2026-04-28T17:43:13.780Z",
+    "user": "admin (admin)",
+    "action": "ACCOUNT_CREATE",
+    "detail": {
+      "username": "mandem",
+      "role": "sonography"
+    }
+  },
+  {
+    "id": "AUD17773982119712ni",
+    "timestamp": "2026-04-28T17:43:31.971Z",
+    "user": "mandem (sonography)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD177739921791448l",
+    "timestamp": "2026-04-28T18:00:17.914Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777399417071o96",
+    "timestamp": "2026-04-28T18:03:37.071Z",
+    "user": "receptionist (receptionist)",
+    "action": "PATIENT_REGISTER",
+    "detail": {
+      "id": "HMS26-8233",
+      "name": "less twin"
+    }
+  },
+  {
+    "id": "AUD17773994177719k9",
+    "timestamp": "2026-04-28T18:03:37.771Z",
+    "user": "receptionist (receptionist)",
+    "action": "BILL_CREATED",
+    "detail": {
+      "id": "BILL1777399417770",
+      "patient": "less twin",
+      "total": 0
+    }
+  },
+  {
+    "id": "AUD1777399439659cr2",
+    "timestamp": "2026-04-28T18:03:59.659Z",
+    "user": "mandem (sonography)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1777408041553bfa",
+    "timestamp": "2026-04-28T20:27:21.553Z",
+    "user": "receptionist (receptionist)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
   }
 ]

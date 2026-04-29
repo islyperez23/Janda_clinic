@@ -89,11 +89,13 @@ app.post("/api/patients", requireAuth, requireRole("receptionist","admin"), (req
   ok(res, patient, 201);
 });
 
-app.patch("/api/patients/:id", requireAuth, requireRole("nurse","doctor","dentist","admin"), (req, res) => {
-  const { addVisit, clearPendingVitals, ...fields } = req.body;
+app.patch("/api/patients/:id", requireAuth, requireRole("nurse","doctor","dentist","admin","maternity","incharge"), (req, res) => {
+  const { addVisit, clearPendingVitals, maternity, addSonographyReport, ...fields } = req.body;
   const updated = db.patients.update(p => p.id === req.params.id, p => {
-    if (addVisit)            p = { ...p, visits:[...p.visits, addVisit] };
-    if (clearPendingVitals)  p = { ...p, pendingVitals:null };
+    if (addVisit)             p = { ...p, visits:[...(p.visits||[]), addVisit] };
+    if (clearPendingVitals)   p = { ...p, pendingVitals:null };
+    if (maternity !== undefined) p = { ...p, maternity };
+    if (addSonographyReport)  p = { ...p, sonographyReports:[...(p.sonographyReports||[]), addSonographyReport] };
     if (Object.keys(fields).length) p = { ...p, ...fields };
     return p;
   });
@@ -310,7 +312,13 @@ app.get("/api/services", requireAuth, (_req, res) => ok(res, db2.services.all())
 app.post("/api/services", requireAuth, requireRole("admin","accountant","store"), (req, res) => {
   const e = requireFields(req.body, ["name","price"]);
   if (e) return fail(res, e);
-  const svc = { id:`SVC${Date.now()}`, active:true, category:"General", ...req.body };
+  const svc = { 
+    id: `SVC${Date.now()}`, 
+    active: true, 
+    category: "General", 
+    insurancePrice: req.body.price * 0.7, // default: 30% discount for insurance
+    ...req.body 
+  };
   db2.services.insert(svc);
   ok(res, svc, 201);
 });

@@ -94,5 +94,37 @@
     "password": "$2a$10$L3McEsgMkcFXQQN.Qe.X8.53rHJX3UEi4scwZ4ybVXkp.ogocWK3O",
     "role": "store",
     "active": true
+  },
+  {
+    "id": "USR011",
+    "username": "store",
+    "role": "store",
+    "name": "Store Manager",
+    "password": "$2a$10$ajy3RkDgoSEOASg4ln95C.Snpv8so1d7ztFz8XPqhDAKwgrHjOSpK",
+    "active": true
+  },
+  {
+    "id": "USR012",
+    "username": "maternity",
+    "role": "maternity",
+    "name": "Maternity Midwife",
+    "password": "$2a$10$ajy3RkDgoSEOASg4ln95C.Snpv8so1d7ztFz8XPqhDAKwgrHjOSpK",
+    "active": true
+  },
+  {
+    "id": "USR013",
+    "username": "sonography",
+    "role": "sonography",
+    "name": "Sonographer",
+    "password": "$2a$10$ajy3RkDgoSEOASg4ln95C.Snpv8so1d7ztFz8XPqhDAKwgrHjOSpK",
+    "active": true
+  },
+  {
+    "id": "USR1777398193779",
+    "name": "mandem",
+    "username": "mandem",
+    "password": "$2a$10$u.UZBjhj8HZizTY2J8qxieSXs2PePHWtqrDumTlNfY7EWiwpg.8i2",
+    "role": "sonography",
+    "active": true
   }
 ]

@@ -4,7 +4,7 @@ import { C, ROLES } from "./theme";
 import { api, setToken, clearToken } from "./api";
 
 // Page components
-import { PatientRegistration, QueueView, PatientSearch, OutpatientBilling, AppointmentsView } from "./pages/Reception";
+import { PatientRegistration } from "./pages/Reception";
 import { NurseVitals, PatientFile, PatientRecords, DentistView, LabView, PharmacyView } from "./pages/Clinical";
 import { InventoryView } from "./pages/Inventory";
 import { AccountantView } from "./pages/Finance";
@@ -12,6 +12,8 @@ import { DirectorDashboard, InChargeDashboard } from "./pages/Director";
 import { AdminAccounts, AuditLog, ChangePassword, SystemSettings } from "./pages/Admin";
 import { ServicePriceList, PaymentCollector, DebtorsList } from "./pages/Billing";
 import { AdmittedPatients } from "./pages/Admissions";
+import { MaternityView } from "./pages/Maternity";
+import { SonographyView } from "./pages/Sonography";
 
 // ── Login Screen ──────────────────────────────────────────────────────────────
 function LoginScreen({ onLogin }) {
@@ -108,6 +110,14 @@ function Sidebar({ user, activeTab, setTab, onLogout, queueCount, lowStockCount,
     ],
     store:[
       { id:"services",     icon:<Package size={15}/>,       label:"Manage Services & Prices" },
+      { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
+    ],
+    maternity:[
+      { id:"maternity",    icon:<Heart size={15}/>,         label:"ANC / Maternity" },
+      { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
+    ],
+    sonography:[
+      { id:"sonography",   icon:<Activity size={15}/>,      label:"Sonography Queue" },
       { id:"changepw",     icon:<RefreshCw size={15}/>,    label:"Change Password" },
     ],
     director:[
@@ -299,7 +309,7 @@ export default function App() {
 
   const handleLogin = (user) => {
     setCurrentUser(user);
-    const defaults = { receptionist:"register", doctor:"myqueue", nurse:"vitals", store:"services", lab:"labpending", pharmacy:"pharmacyqueue", accountant:"financials", director:"dashboard", incharge:"incharge", admin:"accounts", dentist:"dentalqueue" };
+    const defaults = { receptionist:"register", doctor:"myqueue", nurse:"vitals", store:"services", lab:"labpending", pharmacy:"pharmacyqueue", accountant:"financials", director:"dashboard", incharge:"incharge", admin:"accounts", dentist:"dentalqueue", maternity:"maternity", sonography:"sonography" };
     setActiveTab(defaults[user.role]||"");
   };
 
@@ -327,14 +337,16 @@ export default function App() {
     switch(activeTab) {
       case "register":      return <PatientRegistration {...props}/>;
       case "queue":
-      case "myqueue":       return <QueueView {...props} userRole={currentUser.role}/>;
-      case "search":        return <PatientSearch {...props} userRole={currentUser.role}/>;
-      case "appointments":  return <AppointmentsView {...props}/>;
+      case "myqueue":       return <PatientFile {...props}/>;
+      case "search":        return <PatientFile {...props}/>;
+      
       case "vitals":        return <NurseVitals {...props}/>;
       case "patientfile":
       case "laborders":     return <PatientFile {...props}/>;
       case "records":       return <PatientRecords {...props}/>;
-      case "admitted":      return <AdmittedPatients admissions={admissions} patients={patients} user={currentUser} isDoctor={["doctor","dentist"].includes(currentUser.role)} reload={loadData}/>;
+      case "maternity":    return <MaternityView patients={patients} queue={queue} user={currentUser} services={services} reload={loadData}/>;
+      case "sonography":   return <SonographyView patients={patients} queue={queue} user={currentUser} services={services} reload={loadData}/>;
+      case "admitted":     return <AdmittedPatients admissions={admissions} patients={patients} user={currentUser} isDoctor={["doctor","dentist"].includes(currentUser.role)} reload={loadData}/>;
       case "dentalqueue":   return <DentistView {...props}/>;
       case "labpending":
       case "labresults":    return <LabView {...props} queue={queue}/>;
