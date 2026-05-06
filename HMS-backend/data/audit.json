@@ -1776,5 +1776,40 @@
     "user": "receptionist (receptionist)",
     "action": "LOGIN_SUCCESS",
     "detail": {}
+  },
+  {
+    "id": "AUD1778062628830o2i",
+    "timestamp": "2026-05-06T10:17:08.830Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD17780628578397d8",
+    "timestamp": "2026-05-06T10:20:57.839Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1778062926034vdh",
+    "timestamp": "2026-05-06T10:22:06.034Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1778063107921wbr",
+    "timestamp": "2026-05-06T10:25:07.921Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
+  },
+  {
+    "id": "AUD1778063165800ihi",
+    "timestamp": "2026-05-06T10:26:05.805Z",
+    "user": "pharmacy (pharmacy)",
+    "action": "LOGIN_SUCCESS",
+    "detail": {}
   }
 ]

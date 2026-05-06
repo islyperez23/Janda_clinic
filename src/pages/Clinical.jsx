@@ -1020,6 +1020,7 @@ export function PharmacyView({ patients, queue, services, bills, setBills, user,
   const [customDrug, setCustomDrug] = useState({ name:"", price:"" });
 
   // Drug catalogue — show correct price based on patient category
+  const allDrugs = (services||[]).filter(s => s.active && s.category === "Pharmacy");
   const getPrice = (drug, pat) => {
     if (!pat) return drug.price;
     return pat.isInsurance ? (drug.insurancePrice || drug.price) : drug.price;
